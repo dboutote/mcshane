@@ -1,0 +1,39 @@
+
+## PHP STORM FILES
+libraries.*
+scopes.*
+*.iml
+encodings.xml
+misc.xml
+modules.xml
+vcs.xml
+
+## Application Specific
+logs.*
+temp.*
+cache/*
+
+## generic files to ignore
+*~
+*.lock
+*.DS_Store
+*.swp
+*.out
+
+
+## Word Press Ignores
+application/.htaccess
+application/wp-config.php
+application/wp-content/uploads/
+application/wp-content/blogs.dir/
+application/wp-content/upgrade/
+application/wp-content/backup-db/
+application/wp-content/advanced-cache.php
+application/wp-content/wp-cache-config.php
+application/sitemap.xml
+application/*.log
+application/wp-content/cache/
+application/wp-content/backups/
+application/wp-content/*.log
+application/sitemap.xml.gz
+application/wp-content/debug.log
