@@ -9,7 +9,7 @@
 ?>
 
 <div id="frontpage-sidebar" class="frontpage-sidebar-wrap widget-area" role="complementary">
-	
+		
 	<?php if ( is_active_sidebar( 'sidebar-1' ) ) { ?>
 		<div class="frontpage-sidebar-inner sidebar-1">
 			<?php dynamic_sidebar( 'sidebar-1' ); ?>

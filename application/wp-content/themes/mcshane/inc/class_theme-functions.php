@@ -152,9 +152,6 @@ function post_gallery( $output, $attr ){
 	 */
 	function widgets_init() 
 	{	
-		// include custom widgets
-		require get_template_directory() . '/inc/widgets.php';
-		register_widget( 'Widget_Featured_Content' );
 	
 		register_sidebar( array(
 			'name'          => __( 'Front Page Primary Sidebar', 'mcshane' ),

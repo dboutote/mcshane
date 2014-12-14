@@ -154,7 +154,7 @@ $(document).ready(function() {
 	var accordionLink = $('.accordion-toggle'),
 	accordionContent = $('.accordion-content');
 	accordionLink.click(function(e) {
-		e.stopPropagation();
+		e.preventDefault();
 		if (accordionLink.hasClass('active')) {
 			accordionLink.html('Read More');
 		}

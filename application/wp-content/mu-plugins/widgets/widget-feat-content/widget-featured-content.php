@@ -31,9 +31,113 @@ class Widget_Featured_Content extends WP_Widget {
 
 		$this->alt_option_name = 'widget_featured_content';
 
+		add_action( 'init', array($this, 'register_scripts') );
+		add_action( 'admin_enqueue_scripts', array($this, 'add_scripts_backend'), 101 );
+		add_action( 'wp_ajax_setup_type_taxonomies', array($this, 'get_type_taxonomies') );
+
 		add_action( 'save_post', array($this, 'flush_widget_cache') );
 		add_action( 'deleted_post', array($this, 'flush_widget_cache') );
 		add_action( 'switch_theme', array($this, 'flush_widget_cache') );
+	}
+
+
+	/**
+	 * Build a Select Element with Taxonomy Terms
+	 *
+	 * @access  public
+	 * @since   1.0
+	 * @uses get_post_types()
+	 * @uses get_object_taxonomies()
+	 * @uses get_terms()
+	 * @return  string JSON string of select options
+	 */
+	public function get_type_taxonomies()
+	{
+		$raw_data = $_POST;
+		$user_errors = array();
+		$response = array();
+		$notice = '';
+
+
+		$post_types = get_post_types();
+		$selected_type = $_POST['post_type'];
+
+		if( !in_array($selected_type, $post_types ) ){
+			$response['code'] = '-1';
+			$response['notice'] = $notice;
+			die(json_encode($response));
+		}
+
+		$tax_types = get_object_taxonomies($selected_type);
+
+		if( empty($tax_types) ){
+			$response['code'] = '-1';
+			$response['notice'] = $notice;
+			die(json_encode($response));
+		}
+
+		$tax_terms = get_terms($tax_types, array('hide_empty'=>false));
+
+		if( empty($tax_terms) ){
+			$response['code'] = '-1';
+			$response['notice'] = $notice;
+			die(json_encode($response));
+		}
+
+		$notice .= '<option value="">' . __( 'Select Category' ) . '</option>';
+		foreach($tax_terms as $term ){
+			$notice .= '<option value="'.$term->taxonomy . ':' .$term->slug.'">'.$term->name.' ('.$term->count.')</option>';
+		}
+
+		$response['code'] = '1';
+		$response['notice'] = $notice;
+		die(json_encode($response));
+	}
+
+
+	/**
+	 * Load scripts in the backend
+	 *
+	 * @access  public
+	 * @since   1.0
+	 * @uses wp_enqueue_script()
+	 * @uses wp_localize_script()
+	 */
+	public static function add_scripts_backend($hook)
+	{
+		if( 'widgets.php' !== $hook ){ return; }
+
+		wp_enqueue_script('fcw_scripts');
+
+		wp_localize_script(
+			'fcw_scripts',
+			'fcwJax',
+			array(
+				'ajaxurl' => admin_url( 'admin-ajax.php' )
+			)
+		);
+
+		return;
+	}
+
+
+	/**
+	 * Register scripts in the backend
+	 *
+	 * @access  public
+	 * @since   1.0
+	 * @uses wp_register_script()
+	 * @return  void
+	 */
+	public static function register_scripts()
+	{
+		wp_register_script(
+			'fcw_scripts',
+			MU_URL  . 'widgets/widget-feat-content/js/script.js',
+			array( 'jquery' ),
+			1.0,
+			true
+		);
 	}
 
 
@@ -74,6 +178,7 @@ class Widget_Featured_Content extends WP_Widget {
 		$posttype = ( ! empty( $instance['posttype'] ) ) ? $instance['posttype'] : 'post';
 		$orderby = ( ! empty( $instance['orderby'] ) ) ? $instance['orderby'] : 'date';
 		$order = ( ! empty( $instance['order'] ) ) ? $instance['order'] : 'desc';
+		$category = ( ! empty( $instance['category'] ) ) ? $instance['category'] : '';
 
 		$number = ( ! empty( $instance['number'] ) ) ? absint( $instance['number'] ) : 5;
 		if ( ! $number ){
@@ -83,7 +188,21 @@ class Widget_Featured_Content extends WP_Widget {
 		$text_url = ( ! empty( $instance['text_url'] ) ) ? $instance['text_url'] : '';
 		$text_link = ( ! empty( $instance['text_link'] ) ) ? $instance['text_link'] : $text_url;
 		
-	
+		$tax_query = array();
+		
+		if( '' !== $category ) {			
+			$meta_tax = explode(':', $category);
+			$selected_tax = $meta_tax[0];
+			$selected_term = $meta_tax[1];
+			
+			$tax_query =  array(
+				array(
+					'taxonomy' => $selected_tax,
+					'field'    => 'slug',
+					'terms'    => $selected_term,
+				)
+			);		
+		}
 
 		/**
 		 * Filter the arguments for the Recent Posts widget.
@@ -102,7 +221,8 @@ class Widget_Featured_Content extends WP_Widget {
 				'post_status'         => 'publish',
 				'ignore_sticky_posts' => true,
 				'orderby'             => $orderby,
-				'order'               => $order
+				'order'               => $order,
+				'tax_query'           => $tax_query
 			)
 		);
 
@@ -127,13 +247,14 @@ class Widget_Featured_Content extends WP_Widget {
 							$img_src = $image_obj[0];
 							$iw = $image_obj[1];
 							$ih = $image_obj[2];
-							?>
-						<?php }; ?>
+						}; ?>
 						<li data-thumb="<?php echo $img_src;?>">
-							<div class="left"><img src="<?php echo $img_src;?>" class="background-cover" width="<?php echo $iw;?>" height="<?php echo $ih;?>"/></div>
+							<div class="left"><img src="<?php echo $img_src;?>" class="background-cover" width="<?php echo $iw;?>" height="<?php echo $ih;?>" /></div>
 							<div class="right">
 								<h2><?php get_the_title() ? the_title() : the_ID(); ?></h2>
-								<h4>[sub-title (?)]</h4>
+								<?php if( has_subheader() ) { ?>
+									<h4><?php display_subheader(); ?></h4>
+								<?php } ?>								
 								<p><?php the_excerpt(); ?></p>
 								<a href="<?php the_permalink(); ?>" class="btn bottom">More information</a>
 							</div>
@@ -143,7 +264,7 @@ class Widget_Featured_Content extends WP_Widget {
 
 				</ul>
 
-				<?php if ( $text_url ) { ?>					
+				<?php if ( $text_url ) { ?>
 					<a href="<?php echo $text_url; ?>" class="btn bottom right"><?php echo $text_url; ?></a>
 				<?php }; ?>
 
@@ -152,10 +273,10 @@ class Widget_Featured_Content extends WP_Widget {
 		<?php echo $args['after_widget']; ?>
 
 		<?php
-		// Reset the global $the_post as this query will have stomped on it
-		wp_reset_postdata();
-
 		endif;
+		
+		// Reset the global $the_post as this query will have stomped on it
+		wp_reset_postdata();		
 
 		if ( ! $this->is_preview() ) {
 			$cache[ $args['widget_id'] ] = ob_get_flush();
@@ -186,7 +307,8 @@ class Widget_Featured_Content extends WP_Widget {
 		$instance['order']              = $new_instance['order'];
 		$instance['number']             = (int) $new_instance['number'];
 		$instance['text_link']          = strip_tags($new_instance['text_link']);
-		$instance['text_url']          = strip_tags($new_instance['text_url']);
+		$instance['text_url']           = strip_tags($new_instance['text_url']);
+		$instance['category']           = $new_instance['category'];
 
 		$this->flush_widget_cache();
 
@@ -220,14 +342,15 @@ class Widget_Featured_Content extends WP_Widget {
 	public function form( $instance ) {
         $instance = wp_parse_args( (array) $instance,
             array(
-                  'posttype'    => 'post',
+                  'posttype'    => '',
                   'title'       => '',
                   'number'      => 10,
                   'orderby'     => 'date',
                   'order'       => 'DESC',
                   'text_link'   => 'View More',
-				  'text_url'    => ''
-                  )
+				  'text_url'    => '',
+				  'category'    => ''                  
+			)
         );
 		extract($instance);
 		?>
@@ -235,28 +358,57 @@ class Widget_Featured_Content extends WP_Widget {
 		<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:' ); ?></label>
 		<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo $title; ?>" /></p>
 
-		<p><label for="<?php echo $this->get_field_id('posttype'); ?>"><?php _e( 'Post Type:' ); ?></label>
-        <select name="<?php echo $this->get_field_name('posttype'); ?>" id="<?php echo $this->get_field_id('posttype'); ?>" class="widefat">
-            <option value=""><?php _e( 'Select Post Type' ); ?></option>
-            <?php
-            // get all public post types
-			$args = array( 'public' => true );
-            $output = 'objects';
-            $post_types = get_post_types($args,$output);
+		<div class="wfc-content-settings">
+			<p><label for="<?php echo $this->get_field_id('posttype'); ?>"><?php _e( 'Post Type:' ); ?></label>
+			<select name="<?php echo $this->get_field_name('posttype'); ?>" id="<?php echo $this->get_field_id('posttype'); ?>" class="widefat wfc-entries-type">
+				<option value=""><?php _e( 'Select Post Type' ); ?></option>
+				<?php
+				// get all public post types
+				$args = array( 'public' => true );
+				$output = 'objects';
+				$post_types = get_post_types($args,$output);
 
-            // exclude these post types
-            $exclude = array('attachment', 'revision','nav_menu_item', 'page');
-            foreach ($post_types as $key => $v){
-                if(in_array($key, $exclude)) {
-                    unset($post_types[$key]);
-                }
-            }
+				// exclude these post types
+				$exclude = array('attachment', 'revision','nav_menu_item', 'page');
+				foreach ($post_types as $key => $v){
+					if(in_array($key, $exclude)) {
+						unset($post_types[$key]);
+					}
+				}
 
-            foreach ($post_types as $post_type ) {
-                $query_var = ( ''!= $post_type->query_var ) ? $post_type->query_var : $post_type->name ; ?>
-                <option value="<?php echo $query_var; ?>"<?php selected( $instance['posttype'], $query_var ); ?>><?php _e( $post_type->labels->singular_name ); ?></option>
-            <?php } ?>
-        </select></p>
+				foreach ($post_types as $post_type ) {
+					$query_var = ( ''!= $post_type->query_var ) ? $post_type->query_var : $post_type->name ; ?>
+					<option value="<?php echo $query_var; ?>"<?php selected( $instance['posttype'], $query_var ); ?>><?php _e( $post_type->labels->singular_name ); ?></option>
+				<?php } ?>
+			</select></p>
+
+			<?php
+			$hlder_style = ' style="display:none;"';
+			$select_options = '<option value="">' . __( 'Select Category' ) . '</option>';
+
+			if( '' !== $category ){
+				// if the category isn't blank, show the select
+				$hlder_style = '';
+
+				// if the category isn't blank, show the categories
+				$meta_tax = explode(':', $category);
+				$selected_tax = $meta_tax[0];
+				$selected_term = $meta_tax[1];
+				$tax_terms = get_terms($selected_tax, array('hide_empty'=>false));
+				foreach($tax_terms as $term ){
+					$select_options .= '<option value="'.$term->taxonomy . ':' .$term->slug.'"'.selected($term->slug,$selected_term, false).'>'.$term->name.' ('.$term->count.')</option>';
+				}
+			}
+
+			?>
+
+			<div class="taxplaceholder"<?php echo $hlder_style;?>>
+				<p><label for="<?php echo $this->get_field_id('category'); ?>"><?php _e( 'Category:' ); ?></label>
+				<select name="<?php echo $this->get_field_name('category'); ?>" id="<?php echo $this->get_field_id('category'); ?>" class="widefat wfc-entries-tax">				
+					<?php echo $select_options;?>
+				</select></p>
+			</div>
+		</div>
 
         <p><label for="<?php echo $this->get_field_id('orderby'); ?>"><?php _e('Sort List By:'); ?></label>
         <select name="<?php echo $this->get_field_name('orderby'); ?>" id="<?php echo $this->get_field_id('orderby'); ?>" class="widefat">
@@ -291,7 +443,7 @@ class Widget_Featured_Content extends WP_Widget {
 
 		<p><label for="<?php echo $this->get_field_id( 'text_link' ); ?>"><?php _e( '&#8220;View More&#8221; Link Text:' ); ?></label>
 		<input class="widefat" id="<?php echo $this->get_field_id( 'text_link' ); ?>" name="<?php echo $this->get_field_name( 'text_link' ); ?>" type="text" value="<?php echo $text_link; ?>" /></p>
-		
+
 		<p><label for="<?php echo $this->get_field_id( 'text_url' ); ?>"><?php _e( '&#8220;View More&#8221; Link URL:' ); ?></label>
 		<input class="widefat" id="<?php echo $this->get_field_id( 'text_link' ); ?>" name="<?php echo $this->get_field_name( 'text_url' ); ?>" type="text" value="<?php echo $text_url; ?>" /></p>
 <?php
