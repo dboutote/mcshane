@@ -247,4 +247,15 @@ $(document).ready(function() {
 	}
 });
 
+
+/**
+ * darrinb edits
+ *
+ */
+$(document).ready(function() {
+
+
+});
+ 
+
 } )( jQuery );

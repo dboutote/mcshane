@@ -1,12 +1,11 @@
 <?php
 
 /**
- * PreFooter Metabox
+ * Sub-Header Metabox
  *
- * Adds an optional 'pre-footer' section available to all pages but the homepage.
+ * Adds an optional sub header field to the Editor screen
  *
  */
-
 class MetaBox_SubHeader {
 
 	private $meta_config_args;
@@ -172,8 +171,6 @@ class MetaBox_SubHeader {
 	 */
 	public function inner_metabox()
 	{
-	
-	
 		global $post;
 
 		// get configuration args
@@ -309,6 +306,3 @@ function display_subheader( $post_id = null ){
 }
 
 $MetaBox_SubHeader = new MetaBox_SubHeader();
-
-
-?>

@@ -144,3 +144,25 @@ function show_siblings($post_id = null){
 
 	echo $out;
 }
+
+
+/**
+ * Wrap breadcrumb items in <li> yags
+ */
+add_filter('breadcrumb_trail_items', 'mcsh_bc_items');
+function mcsh_bc_items($items){
+	foreach( $items as $k => $item){
+		$items[$k] = '<li>'. $item .'</li>';
+	}
+	return $items;
+}
+
+
+/**
+ * Strip the breadcrumb class from the breadcrumb trail
+ */
+add_filter('breadcrumb_trail', 'mcsh_bc_trail');
+function mcsh_bc_trail($html){
+	$html = str_replace('breadcrumb-trail breadcrumbs', 'breadcrumb-trail', $html);
+	return $html;
+}

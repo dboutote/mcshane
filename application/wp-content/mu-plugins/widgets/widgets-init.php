@@ -18,4 +18,3 @@ function mcsh_widgets_init(){
 	register_widget( 'Widget_Featured_Content' );
 	
 }
-
