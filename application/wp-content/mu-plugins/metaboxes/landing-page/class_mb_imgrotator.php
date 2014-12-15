@@ -27,7 +27,6 @@ class MetaBox_LandingPage_Rotator {
 	{
 		add_action( 'init', array($this, 'register_scripts') );
 		add_action( 'admin_enqueue_scripts', array($this, 'add_scripts_backend'), 101 );
-		add_action( 'wp_ajax_setup_type_taxonomies', array($this, 'get_type_taxonomies') );
 
 		add_action( 'add_meta_boxes', array($this,'create_metabox') );
 		add_action( 'save_post_page',      array($this,'save_meta'), 0, 3 );
