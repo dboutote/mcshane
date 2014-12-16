@@ -47,7 +47,8 @@
 				<?php 
 				$menu_args = array(
 					'container'=> false,
-					'fallback_cb' => false,				
+					'fallback_cb' => false,		
+					'items_wrap' => '%3$s',					
 					'theme_location' => 'primary'
 				); ?>
 				<?php wp_nav_menu($menu_args); ?>
