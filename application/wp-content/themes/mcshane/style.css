@@ -11,3 +11,12 @@ Tags:
 Text Domain: mcshane
 */
 
+
+/**
+ * The breadcrumb plugin adds separators
+ * ref: ~ln 336 in css/style.css
+ */
+.breadcrumbs ul li:before {
+    content: "";
+    display: inline;
+}

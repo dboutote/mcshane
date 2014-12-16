@@ -55,7 +55,7 @@ get_header(); ?>
 	</div> <!-- /.bg-slider -->
 	
 	<div class="left">
-		[children nav]
+		[hierarchal nav]
 		<!-- hierarchal navigation -->
 	</div> <!-- /.left -->
 
