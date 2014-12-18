@@ -187,21 +187,21 @@ class Widget_Featured_Content extends WP_Widget {
 
 		$text_url = ( ! empty( $instance['text_url'] ) ) ? $instance['text_url'] : '';
 		$text_link = ( ! empty( $instance['text_link'] ) ) ? $instance['text_link'] : $text_url;
-		
+
 		$tax_query = array();
-		
-		if( '' !== $category ) {			
+
+		if( '' !== $category ) {
 			$meta_tax = explode(':', $category);
 			$selected_tax = $meta_tax[0];
 			$selected_term = $meta_tax[1];
-			
+
 			$tax_query =  array(
 				array(
 					'taxonomy' => $selected_tax,
 					'field'    => 'slug',
 					'terms'    => $selected_term,
 				)
-			);		
+			);
 		}
 
 		/**
@@ -254,7 +254,7 @@ class Widget_Featured_Content extends WP_Widget {
 								<h2><?php get_the_title() ? the_title() : the_ID(); ?></h2>
 								<?php if( has_subheader() ) { ?>
 									<h4><?php display_subheader(); ?></h4>
-								<?php } ?>								
+								<?php } ?>
 								<p><?php the_excerpt(); ?></p>
 								<a href="<?php the_permalink(); ?>" class="btn bottom">More information</a>
 							</div>
@@ -265,7 +265,7 @@ class Widget_Featured_Content extends WP_Widget {
 				</ul>
 
 				<?php if ( $text_url ) { ?>
-					<a href="<?php echo $text_url; ?>" class="btn bottom right"><?php echo $text_url; ?></a>
+					<a href="<?php echo $text_url; ?>" class="btn bottom right"><?php echo $text_link; ?></a>
 				<?php }; ?>
 
 			</div> <!-- /.feature-slider -->
@@ -274,9 +274,9 @@ class Widget_Featured_Content extends WP_Widget {
 
 		<?php
 		endif;
-		
+
 		// Reset the global $the_post as this query will have stomped on it
-		wp_reset_postdata();		
+		wp_reset_postdata();
 
 		if ( ! $this->is_preview() ) {
 			$cache[ $args['widget_id'] ] = ob_get_flush();
@@ -349,7 +349,7 @@ class Widget_Featured_Content extends WP_Widget {
                   'order'       => 'DESC',
                   'text_link'   => 'View More',
 				  'text_url'    => '',
-				  'category'    => ''                  
+				  'category'    => ''
 			)
         );
 		extract($instance);
@@ -386,14 +386,23 @@ class Widget_Featured_Content extends WP_Widget {
 			$hlder_style = ' style="display:none;"';
 			$select_options = '<option value="">' . __( 'Select Category' ) . '</option>';
 
-			if( '' !== $category ){
+			if( '' !== $category || '' !== $posttype ){
 				// if the category isn't blank, show the select
 				$hlder_style = '';
+				$selected_term = '';
 
 				// if the category isn't blank, show the categories
-				$meta_tax = explode(':', $category);
-				$selected_tax = $meta_tax[0];
-				$selected_term = $meta_tax[1];
+				if( '' !== $category ) {
+					$meta_tax = explode(':', $category);
+					$selected_tax = $meta_tax[0];
+					$selected_term = $meta_tax[1];
+				}
+
+				// if the category is empty, but the posttype isn't
+				if('' === $category ){
+					$selected_tax = get_object_taxonomies($posttype);
+				}
+
 				$tax_terms = get_terms($selected_tax, array('hide_empty'=>false));
 				foreach($tax_terms as $term ){
 					$select_options .= '<option value="'.$term->taxonomy . ':' .$term->slug.'"'.selected($term->slug,$selected_term, false).'>'.$term->name.' ('.$term->count.')</option>';
@@ -404,7 +413,7 @@ class Widget_Featured_Content extends WP_Widget {
 
 			<div class="taxplaceholder"<?php echo $hlder_style;?>>
 				<p><label for="<?php echo $this->get_field_id('category'); ?>"><?php _e( 'Category:' ); ?></label>
-				<select name="<?php echo $this->get_field_name('category'); ?>" id="<?php echo $this->get_field_id('category'); ?>" class="widefat wfc-entries-tax">				
+				<select name="<?php echo $this->get_field_name('category'); ?>" id="<?php echo $this->get_field_id('category'); ?>" class="widefat wfc-entries-tax">
 					<?php echo $select_options;?>
 				</select></p>
 			</div>

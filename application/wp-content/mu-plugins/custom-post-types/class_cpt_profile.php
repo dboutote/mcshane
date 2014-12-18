@@ -35,6 +35,52 @@ class CPT_Profiles
 		add_action( 'init', array($this, 'register_taxonomy'), 999 );
 		add_action( 'save_post_'.self::POST_TYPE, array($this,'save_meta'), 0, 3 );
 		add_filter( 'include_subheader_dont_show_list', array($this, 'check_post_type'), 0,2);
+		add_filter( 'manage_'.self::POST_TYPE.'_posts_columns', array($this, 'add_new_columns') );
+		add_action( 'manage_'.self::POST_TYPE.'_posts_custom_column', array($this,'add_column_data'), 10, 2 );
+	}
+	
+	/**
+	 * Add taxonomy data to taxonomy column on edit.php Table
+	 *
+	 * @access public
+	 * @since 1.0
+	 *
+	 * @param string $column_name The name of the current table column
+	 * @return integer $post_id The ID of the current post
+	 */
+	function add_column_data( $column_name, $post_id ) {
+		if( $column_name == 'ctax_teamdepartment' ) {
+			$_posttype 	= self::POST_TYPE;
+			$_taxonomy 	= 'ctax_teamdepartment';
+			$terms 		= get_the_terms( $post_id, $_taxonomy );
+			if ( !empty( $terms ) ) {
+				$out = array();
+				foreach ( $terms as $c )
+					$_taxonomy_title = esc_html(sanitize_term_field('name', $c->name, $c->term_id, 'category', 'display'));
+					$out[] = "<a href='edit.php?ctax_teamdepartment=$_taxonomy_title&post_type=$_posttype'>$_taxonomy_title</a>";
+				echo join( ', ', $out );
+			}
+			else {
+				_e('Uncategorized');
+			}
+		}
+	}	
+	
+	
+	/**
+	 * Add taxonomy column on edit.php Table
+	 *
+	 * @access public
+	 * @since 1.0
+	 *
+	 * @param array $columns Default table columns
+	 * @return array $columns Updated column array with new taxonomy column
+	 */
+	function add_new_columns($columns) {
+		unset($columns['date']);
+		$columns['ctax_teamdepartment'] = __('Department');
+		$columns['date'] = __('Date');
+		return $columns;
 	}
 
 	/**

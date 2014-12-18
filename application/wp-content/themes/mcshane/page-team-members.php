@@ -1,6 +1,6 @@
 <?php
 /**
- * Template Name: Inside Page
+ * Custom Template for the Team Members page
  *
  * @package WordPress
  * @subpackage McShane
@@ -10,8 +10,8 @@
 get_header();
 
 global $post;
-
 ?>
+
 
 <div class="breadcrumbs">
 
@@ -28,7 +28,7 @@ global $post;
 	</div>
 
 	</div> <!-- /.container -->
-	
+
 </div> <!-- /.breadcrumbs -->
 
 <div class="content container clearfix">
@@ -41,21 +41,14 @@ global $post;
 	<div class="right">
 
 		<?php while ( have_posts() ) : the_post(); ?>
-			<?php if( $post->post_parent > 0 ) { ?>
-				<h1><?php echo get_post( $post->post_parent )->post_title;?></h1>
-			<?php } ?>
-			<h2><?php the_title();?></h2>
+			<h1><?php the_title();?></h1>
+			<hr />
 			<?php the_content();?>
 		<?php endwhile; ?>
 
 	</div> <!-- /.right -->
 
-
-
 </div> <!-- /.content -->
-
-
-
 
 <?php
 get_footer();

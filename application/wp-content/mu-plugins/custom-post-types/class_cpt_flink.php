@@ -31,14 +31,14 @@ class CPT_FeatLink
  	 */
 	public function __construct()
 	{
-		add_action( 'init', array($this, 'register_post_type'), 0 );	
-		add_action( 'save_post_'.self::POST_TYPE, array($this,'save_meta'), 0, 3 );		
+		add_action( 'init', array($this, 'register_post_type'), 0 );
+		add_action( 'save_post_'.self::POST_TYPE, array($this,'save_meta'), 0, 3 );
 		add_filter( 'include_subheader_dont_show_list', array($this, 'check_post_type'), 0,2);
-		add_filter( 'the_content',  array($this,'process_shortcodes'), 7 );
-		#add_shortcode( 'feat_link', array($this, 'feat_link') );		
+		#add_filter( 'the_content',  array($this,'process_shortcodes'), 7 );
+		add_shortcode( 'feat_link', array($this, 'feat_link') );
 	}
-	
-	
+
+
 	/**
 	 * Preprocess shortcodes before WordPress processes the content
 	 *
@@ -62,8 +62,8 @@ class CPT_FeatLink
 
 		return $content;
 	}
-	
-	
+
+
 	/**
 	 * Process the feat_link Shortcode
 	 *
@@ -88,41 +88,44 @@ class CPT_FeatLink
 		$post_object = get_post($id);
 
 		if( !is_null($post_object) ){
-		
+
 			$_flink_url = get_post_meta($id, '_flink_url', true);
-		
-			$content = '';
-			$content .= '<div class="feature-link clearfix">';
-				$content .= '<div class="left">';
-					if($_flink_url) {
-						$content .= '<a href="' . esc_url($_flink_url) . '"><img src="'.get_stylesheet_directory_uri() . '/images/arrow.svg"></a>';
-					}
-					$content .= '<div class="title">' . apply_filters('the_title', $post_object->post_title) . '</div>';
-					$content .= '<div class="content">' . $post_object->post_excerpt . '</div>';
-				$content .= '</div>';
-				if( has_post_thumbnail($id) ) {
-					$image_obj = wp_get_attachment_image_src( get_post_thumbnail_id($id), 'full');
-					$img_src = $image_obj[0];
-					$img_width = $image_obj[1];
-					$img_height = $image_obj[2];
-					$content .= '<div class="right">';
-						$content .= '<img src="'.$img_src.'" width="'.$img_width.'" height="'.$img_height.'" class="background-cover" alt="" />';						
-					$content .= '</div>';
-				}				
-			$content .= '</div>';
 			
+			ob_start(); ?>
+				<div class="feature-link clearfix">
+					<div class="left">
+						<?php if($_flink_url) { ?>
+							<a href="<?php echo esc_url($_flink_url);?>"><img src="<?php echo get_stylesheet_directory_uri();?>/images/arrow.svg"></a>
+							<div class="title"><?php echo apply_filters('the_title', $post_object->post_title);?></div>
+							<div class="content"><?php echo $post_object->post_excerpt;?></div>
+						<?php }; ?>
+					</div>
+					<?php 
+					if( has_post_thumbnail($id) ) {
+						$image_obj = wp_get_attachment_image_src( get_post_thumbnail_id($id), 'full');
+						$img_src = $image_obj[0];
+						$img_width = $image_obj[1];
+						$img_height = $image_obj[2]; ?>
+						<div class="right">
+							<img src="<?php echo $img_src;?>" width="<?php echo $img_width;?>" height="<?php echo $img_height;?>" class="background-cover" alt="" />
+						</div>
+					<?php } ?>
+					
+				</div>
+			<?php
+			$content = ob_get_clean();
 			
 			wp_reset_postdata();
-			
+
 			return $content;
 		}
-		
-		
+
+
 		wp_reset_postdata();
 
 		return $content;
 
-	}	
+	}
 
 	/**
 	 * Remove this post type from the Sub Header meta box
@@ -291,17 +294,17 @@ class CPT_FeatLink
 		// get configuration args
 		$args = self::_get_meta_box_args();
 		extract($args);
-		
+
 		$postID = ( $post && $post->ID > 0 ) ? $post->ID : 0 ;
-		$postParent = ( $post && $post->post_parent > 0 ) ? $post->post_parent : 0 ;	
+		$postParent = ( $post && $post->post_parent > 0 ) ? $post->post_parent : 0 ;
 
 		if('post-new.php' === $pagenow){
 			$postID = 0;
-		}		
+		}
 
 		$output = '';
 		$output .= '<p>'.$meta_box_description.'</p>';
-				
+
 		foreach( $meta_fields as $meta_field ) {
 
 			$meta_field_value = get_post_meta($post->ID, '_'.$meta_field['name'], true);
@@ -316,13 +319,13 @@ class CPT_FeatLink
 				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
 				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
 			}
-			
+
 		}
-		
+
 		if( $postID > 0 && $postParent < 1 ){
 			$output .=  '<p>Copy/paste this shortcode wherever you want your link to appear.<br /><input type="text" style="width:98%;" value="[feat_link id='.$postID.']" readonly="readonly" /></p>';
-		}		
-		
+		}
+
 		echo $output;
 
 		return;

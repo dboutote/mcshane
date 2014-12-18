@@ -63,6 +63,11 @@ include( MU_CPT_DIR . '/cpt-init.php');
 remove_action('wp_head', 'start_post_rel_link', 10, 0 ); 
 remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0);
 
+//move wpautop filter to AFTER shortcode is processed
+remove_filter( 'the_content', 'wpautop' );
+#add_filter( 'the_content', 'wpautop' , 999);
+#add_filter( 'the_content', 'shortcode_unautop',9999 );
+
 
 
 
