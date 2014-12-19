@@ -10,7 +10,6 @@
 get_header();
 
 global $post;
-
 ?>
 
 <div class="breadcrumbs">

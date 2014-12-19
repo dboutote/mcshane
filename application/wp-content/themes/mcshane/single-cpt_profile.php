@@ -35,76 +35,11 @@ get_header(); ?>
 
 
 <div class="content container clearfix">
+
 	<div class="left">
-	<nav>
-		<ul>
-			<li class="active"><span class="toggle">+</span><a href="#">Gr. Parent (Team Members)</a>
-				<ul>
-					<li><span class="toggle">+</span><a href="#">Uncle (Exec Management)</a>
-						<ul>
-							<li><a href="#">Cousin</a></li>
-							<li><a href="#">Cousin</a></li>
-							<li><a href="#">Cousin</a></li>
-						</ul>
-					</li>
-					<li class="active"><span class="toggle">+</span><a href="#">Parent (Financial/Legal)</a>
-						<ul>
-							<li class="active"><a href=""><?php echo apply_filters('the_title', $queried_profile->post_title); ?></a></li>
-							<li><a href="#">Sibling</a></li>
-							<li><a href="#">Sibling</a></li>
-						</ul>
-					</li>
-					<li><span class="toggle">+</span><a href="#">Uncle (Development Team)</a>
-						<ul>
-							<li><a href="#">Cousin</a></li>
-							<li><a href="#">Cousin</a></li>
-							<li><a href="#">Cousin</a></li>
-						</ul>
-					</li>			
-				</ul>
-			</li>
-			
-	<li><span class="toggle">+</span><a href="#">Gr. Uncle (History)</a>
-	<ul>
-	<li><span class="toggle">+</span><a href="#">Second Level Link</a>
-	<ul>
-	<li><a href="#">Third Level Link</a></li>
-	<li><a href="#">Third Level Link</a></li>
-	</ul>
-	</li>
-	<li><span class="toggle">+</span><a href="#">Second Level Link</a>
-	<ul>
-	<li><a href="#">Third Level Link</a></li>
-	<li><a href="#">Third Level Link</a></li>
-	</ul>
-	</li>
-	<li><span class="toggle">+</span><a href="#">Second Level Link</a>
-	<ul>
-	<li><a href="#">Third Level Link</a></li>
-	<li><a href="#">Third Level Link</a></li>
-	</ul>
-	</li>
-	</ul>
-	</li>
-	<li><span class="toggle">+</span><a href="#">Gr. Uncle (Giving Back)</a>
-	<ul>
-	<li><span class="toggle">+</span><a href="#">Second Level Link</a>
-	<ul>
-	<li><a href="#">Third Level Link</a></li>
-	</ul>
-	</li>
-	<li><span class="toggle">+</span><a href="#">Second Level Link</a>
-	<ul>
-	<li><a href="#">Third Level Link</a></li>
-	<li><a href="#">Third Level Link</a></li>
-	<li><a href="#">Third Level Link</a></li>
-	</ul>
-	</li>
-	</ul>
-	</li>
-	</ul>
-	</nav>
-	</div><!-- /.left -->
+		[hierarchal nav]
+		<!-- hierarchal navigation -->
+	</div> <!-- /.left -->
 	
 	<div class="right">
 	

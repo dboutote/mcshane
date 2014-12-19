@@ -55,6 +55,9 @@ include( MU_METABOX_DIR . '/meta-init.php');
 // include any custom post types
 include( MU_CPT_DIR . '/cpt-init.php');
 
+// include any custom taxonomies
+include( MU_TAX_DIR . '/tax-init.php');
+
 
 
 /**
@@ -64,9 +67,9 @@ remove_action('wp_head', 'start_post_rel_link', 10, 0 );
 remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0);
 
 //move wpautop filter to AFTER shortcode is processed
-remove_filter( 'the_content', 'wpautop' );
+#remove_filter( 'the_content', 'wpautop' );
 #add_filter( 'the_content', 'wpautop' , 999);
-#add_filter( 'the_content', 'shortcode_unautop',9999 );
+add_filter( 'the_content', 'shortcode_unautop',9999 );
 
 
 

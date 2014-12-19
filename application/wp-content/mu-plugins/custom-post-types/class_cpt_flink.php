@@ -175,27 +175,18 @@ class CPT_FeatLink
 			self::POST_TYPE,
 			array(
 				'labels'                 => $labels,
-				'public'                 => false,
+				'public'                 => true,
 				'show_ui'                => true,
 				'exclude_from_search'    => true,
 				'show_in_nav_menus'      => false,
 				//'menu_position'          => 5,
 				'menu_icon'              => 'dashicons-admin-links',
 				'capability_type'        => 'post',
-				'capabilities'           => array(
-					'edit_post'              => 'manage_categories',
-					'edit_posts'             => 'manage_categories',
-					'edit_others_posts'      => 'manage_categories',
-					'publish_posts'          => 'manage_categories',
-					'read_private_posts'     => 'manage_categories',
-					'delete_post'            => 'manage_categories',
-					'read_post'              => 'manage_categories'
-				),
 				'supports'               => array('title','excerpt', 'thumbnail'),
 				'register_meta_box_cb'   => array(__CLASS__, 'create_metabox' ),
 				//'taxonomies'             => array('ctax_teamdepartment'),
 				'has_archive'            => false,
-				'rewrite'                => false,
+				'rewrite'                => array('slug' => 'flinks', 'with_front' => false),
 				'query_var'              => false
 			)
 		);
