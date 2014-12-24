@@ -37,6 +37,7 @@ class CPT_Galleries
 		add_action( 'admin_enqueue_scripts', array($this, 'add_scripts_backend'), 101 );
 		add_action( 'save_post_'.self::POST_TYPE, array($this,'save_meta'), 0, 3 );
 		add_filter( 'include_subheader_dont_show_list', array($this, 'check_post_type'), 0,2);
+		add_filter( 'include_featquote_dont_show_list', array($this, 'check_post_type'), 0,2);
 		#add_filter( 'manage_'.self::POST_TYPE.'_posts_columns', array($this, 'add_new_columns') );
 		#add_action( 'manage_'.self::POST_TYPE.'_posts_custom_column', array($this,'add_column_data'), 10, 2 );
 		add_action( 'wp_ajax_setup_gallery_paged_posts', array($this, 'get_paged_posts') );
@@ -97,6 +98,8 @@ class CPT_Galleries
 		if( !is_null($post_object) ){
 
 			$_gallery_items = get_post_meta($id, '_gallery_items', true);
+			$gallery_title = $post_object->post_title;
+			$gallery_title_class = sanitize_title($gallery_title);
 
 			if( is_array($_gallery_items) && count($_gallery_items) > 1 ) {
 
@@ -105,7 +108,7 @@ class CPT_Galleries
 				});
 				ob_start(); ?>
 
-				<div class="gallery clearfix">
+				<div class="gallery clearfix <?php echo $gallery_title_class;?>-gallery">
 					<ul>
 						<?php foreach($_gallery_items as $_gallery_item) { ?>
 							<?php
@@ -449,15 +452,6 @@ class CPT_Galleries
 				//'menu_position'          => 5,
 				'menu_icon'              => 'dashicons-format-gallery',
 				'capability_type'        => 'post',
-				'capabilities'           => array(
-					'edit_post'              => 'manage_categories',
-					'edit_posts'             => 'manage_categories',
-					'edit_others_posts'      => 'manage_categories',
-					'publish_posts'          => 'manage_categories',
-					'read_private_posts'     => 'manage_categories',
-					'delete_post'            => 'manage_categories',
-					'read_post'              => 'manage_categories',
-				),
 				'supports'               => array('title'),
 				'register_meta_box_cb'   => array(__CLASS__, 'create_metabox' ),
 				'taxonomies'             => array(),

@@ -1,6 +1,6 @@
 <?php
 /**
- * Template Name: Inside Page
+ * Template Name: Gallery Page
  *
  * @package WordPress
  * @subpackage McShane
@@ -40,8 +40,11 @@ global $post;
 
 		<?php if( $post->post_parent > 0 ) { ?>
 			<h1><?php echo get_post( $post->post_parent )->post_title;?></h1>
-		<?php } ?>
-			
+			<hr />
+			<br />
+			<br />			
+		<?php } ?>	
+		
 		<?php while ( have_posts() ) : the_post(); ?>
 			<h2><?php the_title();?></h2>
 			<?php the_content();?>
