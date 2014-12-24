@@ -9,6 +9,9 @@
 global $post;
 $queried_profile = $post;
 $post_type = get_post_type_object( get_post_type() );
+$profile_terms = wp_get_object_terms( get_the_ID(),  'ctax_teamdepartment' );
+$parent_tax_name = ( !is_wp_error($profile_terms) ) ? $profile_terms[0]->name : '' ;
+$parent_tax_slug = ( !is_wp_error($profile_terms) ) ? $profile_terms[0]->slug : '' ;
 get_header(); ?>
 
 
@@ -16,9 +19,10 @@ get_header(); ?>
 
 <div class="container clearfix">
 <ul>
-<li><a href="#">Home</a></li>
-<li><a href="#">[Gr. Parent: Page that matches the Post Type Label below]</a></li>
-<li><a href="#">[Parent: Page that matches the Taxonomy Term name below]</a></li>
+<li><a href="<?php echo esc_url( home_url() );?>">Home</a></li> / 
+<li><a href="<?php echo get_permalink( get_page_by_path( 'about-us' ) ) ?>"><?php _e('About Us'); ?></a></li> / 
+<li><a href="<?php echo get_permalink( get_page_by_path( 'about-us/team-members' ) ) ?>"><?php _e('Team Members'); ?></a></li> / 
+<li><a href="<?php echo get_permalink( get_page_by_path( 'about-us/team-members/'.$parent_tax_slug ) ) ?>"><?php _e($parent_tax_name); ?></a> / </li>
 <li><?php the_title();?></li>
 </ul>
 
@@ -51,16 +55,18 @@ get_header(); ?>
 		$_job_email = get_post_meta($postid, '_job_email', true);
 		$_vcard_url = get_post_meta($postid, '_vcard_url', true);
 		$_prop_tag = get_post_meta($postid, '_prop_tag', true);
+		$_feat_quote = get_post_meta($postid, '_feat_quote', true);
+		$_feat_quote_author = get_post_meta($postid, '_feat_quote_author', true);
+		$_feat_quote_author_title = get_post_meta($postid, '_feat_quote_author_title', true);
 		?>	
 
-		<h1>Gr. Parent [Post Type Label] <?php echo $post_type->labels->name;?></h1>
+		<h1>G. Parent [Post Type Label] <?php echo $post_type->labels->name;?></h1>
 
 		<hr /> <br /> <br />
 
-		<?php 
-		$profile_terms = wp_get_object_terms( get_the_ID(),  'ctax_teamdepartment' );
-		if( !is_wp_error($profile_terms) ) { ?>
-			<h3>Parent [Taxonomy Term] <?php echo $profile_terms[0]->name; ?></h3>
+		<?php
+		if( '' !== $parent_tax_name ) { ?>
+			<h3>Parent [Taxonomy Term] <?php _e($parent_tax_name); ?></h3>
 		<?php } ?>
 
 		<?php while ( have_posts() ) : the_post(); ?>
@@ -104,11 +110,16 @@ get_header(); ?>
 				</div> <!-- /.team-page-left -->
 
 				<div class="team-page-right">
+					<?php if($_feat_quote) { ?>
 					<div class="quote">
-						<p>"Our team wanted to reach inside this corridor and help fill the coming demand for bay area distribution ahead of the curve. Hayward provided us that strategic point of market entry."</p>
-						<p><em>— John Dobrott,<br>
-						&emsp;President-Industrial Division</em></p>
+						<p>&#8220;<?php _e($_feat_quote); ?>&#8221;</p>
+						<?php if($_feat_quote_author) { ?>
+							<p><em>&#8212;
+								<?php echo $_feat_quote_author; ?><?php if($_feat_quote_author_title) { echo ',<br />&emsp;' . $_feat_quote_author_title; }; ?>
+							</em></p> 
+						<?php }; ?>
 					</div>
+					<?php } ?>
 				</div> <!-- /.team-page-right -->
 
 			</div> <!-- /.clearfix -->

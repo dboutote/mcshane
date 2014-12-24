@@ -38,7 +38,7 @@ class CPT_Profiles
 		add_filter( 'manage_'.self::POST_TYPE.'_posts_columns', array($this, 'add_new_columns') );
 		add_action( 'manage_'.self::POST_TYPE.'_posts_custom_column', array($this,'add_column_data'), 10, 2 );
 	}
-	
+
 	/**
 	 * Add taxonomy data to taxonomy column on edit.php Table
 	 *
@@ -64,9 +64,9 @@ class CPT_Profiles
 				_e('Uncategorized');
 			}
 		}
-	}	
-	
-	
+	}
+
+
 	/**
 	 * Add taxonomy column on edit.php Table
 	 *
@@ -134,7 +134,7 @@ class CPT_Profiles
 				'public'                 => true,
 				'exclude_from_search'    => true,
 				'show_in_nav_menus'      => false,
-				'menu_icon'              => 'dashicons-id-alt',				
+				'menu_icon'              => 'dashicons-id-alt',
 				'supports'               => array('title','editor','excerpt', 'thumbnail'),
 				'register_meta_box_cb'   => array(__CLASS__, 'create_metabox' ),
 				'taxonomies'             => array('ctax_teamdepartment'),
@@ -203,7 +203,7 @@ class CPT_Profiles
 				'default' => '0',
 				'title' => __('Menu Order'),
 				'description' => __( '', 'mcshane' )
-			),			
+			),
 			'job_title' => array(
 				'name' => 'job_title',
 				'type' => 'text',
@@ -238,7 +238,7 @@ class CPT_Profiles
 				'default' => '',
 				'title' => __('Property Tag'),
 				'description' => __( 'Enter the tag used to designate this team member&#8217;s representative experience. (e.g., &#8220;jsmith&#8221;)', 'mcshane' ),
-			)			
+			)		
 		);
 
 		$args = array(
@@ -284,12 +284,12 @@ class CPT_Profiles
 			}
 
 			wp_nonce_field( plugin_basename(__CLASS__), $meta_field['name'].'_noncename' );
-			
+
 			if ( 'menu_order' === $meta_field['name']) {
 				$meta_field_value = $post->menu_order;
 				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
 				$output .= '<input type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="4" /> <span class="desc">'.$meta_field['description'].'</span></p>';
-			}		
+			}
 
 			if ( 'job_title' === $meta_field['name']) {
 				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
@@ -310,12 +310,11 @@ class CPT_Profiles
 				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
 				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
 			}
-			
+
 			if ( 'prop_tag' === $meta_field['name']) {
 				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
 				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
-			}			
-
+			}
 		}
 
 		echo $output;
@@ -368,11 +367,11 @@ class CPT_Profiles
 		extract($args);
 
 		foreach($meta_fields as $meta_field) {
-		
+
 			// let WP save menu_order in $wpdb->posts table, not meta
 			if ( 'menu_order' === $meta_field['name']) {
 				continue;
-			}		
+			}
 
 			// verify this came from the our screen and with proper authorization, (b/c save_post can be triggered at other times)
 			if( !isset($_POST[$meta_field['name'].'_noncename']) || !wp_verify_nonce( $_POST[$meta_field['name'].'_noncename'], __CLASS__ ) ) {
