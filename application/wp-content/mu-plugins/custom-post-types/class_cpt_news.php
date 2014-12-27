@@ -6,7 +6,7 @@ defined( 'ABSPATH' ) or die( 'Nothing here!' );
 
 
 /**
- * CPT_Profiles post type class
+ * CPT_News post type class
  *
  * A custom post type for displaying staff profiles
  *
@@ -14,10 +14,11 @@ defined( 'ABSPATH' ) or die( 'Nothing here!' );
  * @subpackage McShane
  * @since McShane 1.0
  */
-class CPT_Profiles
+class CPT_News
 {
 	private $meta_config_args;
-	const POST_TYPE = 'cpt_profile';
+	const POST_TYPE = 'cpt_news';
+	const TAX_NAME = 'ctax_newstype';
 
 
 	/**
@@ -35,6 +36,7 @@ class CPT_Profiles
 		add_action( 'init', array($this, 'register_taxonomy'), 999 );
 		add_action( 'save_post_'.self::POST_TYPE, array($this,'save_meta'), 0, 3 );
 		add_filter( 'include_subheader_dont_show_list', array($this, 'check_post_type'), 0,2);
+		add_filter( 'include_featquote_dont_show_list', array($this, 'check_post_type'), 0,2);
 		add_filter( 'manage_'.self::POST_TYPE.'_posts_columns', array($this, 'add_new_columns') );
 		add_action( 'manage_'.self::POST_TYPE.'_posts_custom_column', array($this,'add_column_data'), 10, 2 );
 	}
@@ -48,16 +50,18 @@ class CPT_Profiles
 	 * @param string $column_name The name of the current table column
 	 * @return integer $post_id The ID of the current post
 	 */
-	function add_column_data( $column_name, $post_id ) {
-		if( $column_name == 'ctax_teamdepartment' ) {
-			$_posttype 	= self::POST_TYPE;
-			$_taxonomy 	= 'ctax_teamdepartment';
+	function add_column_data( $column_name, $post_id ) 
+	{
+		$_taxonomy 	= self::TAX_NAME;
+		$_posttype 	= self::POST_TYPE;
+		
+		if( $column_name == $_taxonomy ) {			
 			$terms 		= get_the_terms( $post_id, $_taxonomy );
 			if ( !empty( $terms ) ) {
 				$out = array();
 				foreach ( $terms as $c )
 					$_taxonomy_title = esc_html(sanitize_term_field('name', $c->name, $c->term_id, 'category', 'display'));
-					$out[] = "<a href='edit.php?ctax_teamdepartment=$_taxonomy_title&post_type=$_posttype'>$_taxonomy_title</a>";
+					$out[] = '<a href="edit.php?' . $_taxonomy . '=' . $_taxonomy_title . '&post_type=' . $_posttype . '">' . $_taxonomy_title . '</a>';
 				echo join( ', ', $out );
 			}
 			else {
@@ -76,9 +80,10 @@ class CPT_Profiles
 	 * @param array $columns Default table columns
 	 * @return array $columns Updated column array with new taxonomy column
 	 */
-	function add_new_columns($columns) {
+	function add_new_columns($columns)
+	{
 		unset($columns['date']);
-		$columns['ctax_teamdepartment'] = __('Department');
+		$columns[self::TAX_NAME] = __('News Category');
 		$columns['date'] = __('Date');
 		return $columns;
 	}
@@ -107,7 +112,7 @@ class CPT_Profiles
 	 */
 	public static function register_post_type()
 	{
-		$name = 'Team Member';
+		$name = 'News Post';
 		$plural     = $name . 's';
 
 		// Labels
@@ -135,12 +140,12 @@ class CPT_Profiles
 				'exclude_from_search'    => false,
 				'hierarchical'           => true,
 				'show_in_nav_menus'      => false,
-				'menu_icon'              => 'dashicons-id-alt',
+				'menu_icon'              => 'dashicons-megaphone',
 				'supports'               => array('title','editor','excerpt', 'thumbnail'),
 				'register_meta_box_cb'   => array(__CLASS__, 'create_metabox' ),
-				'taxonomies'             => array('ctax_teamdepartment'),
+				'taxonomies'             => array(self::TAX_NAME),
 				'has_archive'            => false,
-				'rewrite'                => array('slug' => 'team-members', 'with_front' => true),
+				'rewrite'                => array('slug' => 'news', 'with_front' => false),
 			)
 		);
 	}
@@ -188,7 +193,7 @@ class CPT_Profiles
 	protected static function _set_meta_box_args()
 	{
 
-		$basename = 'profileinfo';
+		$basename = 'newsinfo';
 		$post_type = get_post_type();
 		$post_types = array(self::POST_TYPE);
 		if( $post_type ){
@@ -204,41 +209,13 @@ class CPT_Profiles
 				'title' => __('Menu Order'),
 				'description' => __( '', 'mcshane' )
 			),
-			'job_title' => array(
-				'name' => 'job_title',
+			'pdf_url' => array(
+				'name' => 'pdf_url',
 				'type' => 'text',
 				'default' => '',
-				'title' => __('Job Title'),
-				'description' => __( 'Enter team member&#8217;s job title.', 'mcshane' ),
+				'title' => __('PDF URL'),
+				'description' => __( 'URL to PDF file.', 'mcshane' ),
 			),
-			'job_phone' => array(
-				'name' => 'job_phone',
-				'type' => 'text',
-				'default' => '',
-				'title' => __('Telephone Number'),
-				'description' => __( 'Enter team member&#8217;s telephone number.', 'mcshane' ),
-			),
-			'job_email' => array(
-				'name' => 'job_email',
-				'type' => 'text',
-				'default' => '',
-				'title' => __('Email Address'),
-				'description' => __( 'Enter team member&#8217;s email address.', 'mcshane' ),
-			),
-			'vcard_url' => array(
-				'name' => 'vcard_url',
-				'type' => 'text',
-				'default' => '',
-				'title' => __('vCard URL'),
-				'description' => __( 'Enter the URL for this team member&#8217;s vCard.', 'mcshane' ),
-			),
-			'prop_tag' => array(
-				'name' => 'prop_tag',
-				'type' => 'text',
-				'default' => '',
-				'title' => __('Property Tag'),
-				'description' => __( 'Enter the tag used to designate this team member&#8217;s representative experience. (e.g., &#8220;jsmith&#8221;)', 'mcshane' ),
-			)		
 		);
 
 		$args = array(
@@ -285,36 +262,19 @@ class CPT_Profiles
 
 			wp_nonce_field( plugin_basename(__CLASS__), $meta_field['name'].'_noncename' );
 
+			/*
 			if ( 'menu_order' === $meta_field['name']) {
 				$meta_field_value = $post->menu_order;
 				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
 				$output .= '<input type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="4" /> <span class="desc">'.$meta_field['description'].'</span></p>';
 			}
+			*/
 
-			if ( 'job_title' === $meta_field['name']) {
+			if ( 'pdf_url' === $meta_field['name']) {
 				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
 				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
 			}
 
-			if ( 'job_phone' === $meta_field['name']) {
-				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
-				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
-			}
-
-			if ( 'job_email' === $meta_field['name']) {
-				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
-				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
-			}
-
-			if ( 'vcard_url' === $meta_field['name']) {
-				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
-				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
-			}
-
-			if ( 'prop_tag' === $meta_field['name']) {
-				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
-				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
-			}
 		}
 
 		echo $output;
@@ -383,21 +343,8 @@ class CPT_Profiles
 			$data = ( is_array($data) ) ? array_filter($data) : trim($data);
 
 			if ( '' != $data && '-1' != $data  ) {
-
-				// update the _sub_header meta field (it's hidden)
-				if ( 'job_title' === $meta_field['name']) {
-					update_post_meta( $post->ID, '_sub_header', $data );
-				}
-
 				update_post_meta( $post->ID, '_'.$meta_field['name'], $data );
-
 			} else {
-
-				// delete the _sub_header meta field (it's hidden)
-				if ( 'job_title' === $meta_field['name']) {
-					delete_post_meta( $post->ID, '_sub_header');
-				}
-
 				delete_post_meta( $post->ID, '_'.$meta_field['name'] );
 			}
 
@@ -417,11 +364,11 @@ class CPT_Profiles
 	public function register_taxonomy()
 	{
 
-		$name = 'Team Department';
-		$plural	= $name . 's';
+		$name = 'News Category';
+		$plural	= 'News Categories';
 
 		register_taxonomy(
-			'ctax_teamdepartment',    // Name of taxonomoy
+			self::TAX_NAME,    // Name of taxonomoy
 			self::POST_TYPE,          // Applies to these post types
 			array(
 				'label'                         => _x( $plural, 'taxonomy general name' ),			// A descriptive name for the taxonomy (marked for translation.)
@@ -462,11 +409,7 @@ class CPT_Profiles
 	}
 
 
-
-
-
-
 }
 
 
-$CPT_Profiles = new CPT_Profiles();
+$CPT_News = new CPT_News();

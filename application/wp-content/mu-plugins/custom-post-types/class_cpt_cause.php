@@ -6,7 +6,7 @@ defined( 'ABSPATH' ) or die( 'Nothing here!' );
 
 
 /**
- * CPT_Milestones post type class
+ * CPT_Causes post type class
  *
  * A custom post type for displaying staff profiles
  *
@@ -14,10 +14,10 @@ defined( 'ABSPATH' ) or die( 'Nothing here!' );
  * @subpackage McShane
  * @since McShane 1.0
  */
-class CPT_Milestones
+class CPT_Causes
 {
 	private $meta_config_args;
-	const POST_TYPE = 'cpt_milestone';
+	const POST_TYPE = 'cpt_cause';
 
 
 	/**
@@ -62,7 +62,7 @@ class CPT_Milestones
 	 */
 	public static function register_post_type()
 	{
-		$name = 'Milestone';
+		$name = 'Cause';
 		$plural     = $name . 's';
 
 		// Labels
@@ -87,15 +87,16 @@ class CPT_Milestones
 			array(
 				'labels'                 => $labels,
 				'public'                 => true,
-				'exclude_from_search'    => false,
-				'hierarchical'           => true,
+				'exclude_from_search'    => true,
+				#'hierarchical'           => true,
 				'show_in_nav_menus'      => false,
-				'menu_icon'              => 'dashicons-location',
+				'menu_icon'              => 'dashicons-heart',
 				'supports'               => array('title','editor','excerpt','thumbnail'),
 				'register_meta_box_cb'   => array(__CLASS__, 'create_metabox' ),
 				'taxonomies'             => array(),
 				'has_archive'            => false,
-				'rewrite'                => array('slug' => 'milestones', 'with_front' => false),
+				'rewrite'                => array('slug' => 'causes', 'with_front' => false),
+				'query_var'              => false
 			)
 		);
 	}
@@ -143,7 +144,7 @@ class CPT_Milestones
 	protected static function _set_meta_box_args()
 	{
 
-		$basename = 'milestoneinfo';
+		$basename = 'causeinfo';
 		$post_type = get_post_type();
 		$post_types = array(self::POST_TYPE);
 		if( $post_type ){
@@ -158,7 +159,7 @@ class CPT_Milestones
 				'default' => '0',
 				'title' => __('Menu Order'),
 				'description' => __( '', 'mcshane' )
-			),
+			),	
 		);
 
 		$args = array(
@@ -292,4 +293,4 @@ class CPT_Milestones
 }
 
 
-$CPT_Milestones = new CPT_Milestones();
+$CPT_Causes = new CPT_Causes();

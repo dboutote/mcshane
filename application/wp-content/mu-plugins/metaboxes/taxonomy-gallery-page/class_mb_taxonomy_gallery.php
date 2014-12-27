@@ -161,6 +161,13 @@ class MetaBox_TaxonomyGallery {
 		}
 
 		$meta_fields = array(
+			'p_type' => array(
+				'name' => 'p_type',
+				'type' => 'select',
+				'default' => '',
+				'title' => __('Post Type'),
+				'description' => __('Select which type of content to display on this page.')
+			),
 			'tax_type' => array(
 				'name' => 'tax_type',
 				'type' => 'select',
@@ -238,12 +245,22 @@ class MetaBox_TaxonomyGallery {
 		$tax_args= array(
 			'public' => true,
 		);
-		$output = 'objects';
-		$taxonomies = get_taxonomies($tax_args,$output);
+		$tax_output = 'objects';
+		$taxonomies = get_taxonomies($tax_args,$tax_output);
 		foreach ($taxonomies as $tax ){
 			$tax_array[$tax->name] = $tax->labels->singular_name;
 		}
-
+		
+		$post_args = array( 'public' => true );
+		$post_output = 'objects';
+		$post_types = get_post_types($post_args,$post_output);
+		// exclude these post types
+		$exclude = array('attachment', 'revision','nav_menu_item','page', 'cpt_flink');
+		foreach ($post_types as $key => $v){
+			if(in_array($key, $exclude)) {
+				unset($post_types[$key]);
+			}
+		}
 
 		$output ='<div class="tg-settings">';
 
@@ -258,6 +275,24 @@ class MetaBox_TaxonomyGallery {
 			}
 
 			wp_nonce_field( plugin_basename(__CLASS__), $meta_field['name'].'_noncename' );
+			
+			if( 'p_type' === $meta_field['name'] ) {
+			debug($meta_field_value);
+
+				// sort alphabetically
+				asort($post_types);
+				$post_type_selected = ( '' !== $meta_field_value ) ? ' type-selected': '';
+	
+				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
+				$output .= '<select class="post-type'.$post_type_selected.'" name="'.$meta_field['name'].'" style="width:99%;">';
+				$output .= '<option value="">-- '. __( 'Select Post Type' ).' --</option>';
+				foreach( $post_types as $post_type ){
+					$query_var = ( ''!= $post_type->query_var ) ? $post_type->query_var : $post_type->name ; 
+					$output .= '<option id="'.$meta_field['name'].'_'.$query_var.'" value="'.$query_var.'"'.selected($query_var,$meta_field_value, false ).' />'.__( $post_type->labels->singular_name ).'</option>';
+				}
+				$output .= '</select>';
+				$output .= $meta_field['description'].'<br /></p>';
+			}
 
 
 			if( 'tax_type' === $meta_field['name'] ) {

@@ -6,7 +6,7 @@ defined( 'ABSPATH' ) or die( 'Nothing here!' );
 
 
 /**
- * CPT_Profiles post type class
+ * CPT_Offices post type class
  *
  * A custom post type for displaying staff profiles
  *
@@ -14,10 +14,10 @@ defined( 'ABSPATH' ) or die( 'Nothing here!' );
  * @subpackage McShane
  * @since McShane 1.0
  */
-class CPT_Profiles
+class CPT_Offices
 {
 	private $meta_config_args;
-	const POST_TYPE = 'cpt_profile';
+	const POST_TYPE = 'cpt_office';
 
 
 	/**
@@ -32,56 +32,24 @@ class CPT_Profiles
 	public function __construct()
 	{
 		add_action( 'init', array($this, 'register_post_type'), 0 );
-		add_action( 'init', array($this, 'register_taxonomy'), 999 );
 		add_action( 'save_post_'.self::POST_TYPE, array($this,'save_meta'), 0, 3 );
-		add_filter( 'include_subheader_dont_show_list', array($this, 'check_post_type'), 0,2);
-		add_filter( 'manage_'.self::POST_TYPE.'_posts_columns', array($this, 'add_new_columns') );
-		add_action( 'manage_'.self::POST_TYPE.'_posts_custom_column', array($this,'add_column_data'), 10, 2 );
+		add_filter( 'include_subheader_dont_show_list', array($this, 'check_post_type'), 0,2 );
+		add_filter( 'include_featquote_dont_show_list', array($this, 'check_post_type'), 0,2 );
+		add_action( 'wp_head', array($this, 'load_latlong') );
 	}
 
-	/**
-	 * Add taxonomy data to taxonomy column on edit.php Table
-	 *
-	 * @access public
-	 * @since 1.0
-	 *
-	 * @param string $column_name The name of the current table column
-	 * @return integer $post_id The ID of the current post
-	 */
-	function add_column_data( $column_name, $post_id ) {
-		if( $column_name == 'ctax_teamdepartment' ) {
-			$_posttype 	= self::POST_TYPE;
-			$_taxonomy 	= 'ctax_teamdepartment';
-			$terms 		= get_the_terms( $post_id, $_taxonomy );
-			if ( !empty( $terms ) ) {
-				$out = array();
-				foreach ( $terms as $c )
-					$_taxonomy_title = esc_html(sanitize_term_field('name', $c->name, $c->term_id, 'category', 'display'));
-					$out[] = "<a href='edit.php?ctax_teamdepartment=$_taxonomy_title&post_type=$_posttype'>$_taxonomy_title</a>";
-				echo join( ', ', $out );
-			}
-			else {
-				_e('Uncategorized');
-			}
+	public function load_latlong(){
+		if ( is_singular(self::POST_TYPE) ) {
+			global $post;
+			$postid = $post->ID;
+			$_office_lat = get_post_meta($postid, '_office_lat', true);
+			$_office_long = get_post_meta($postid, '_office_long', true);
+			$_office_lat = ( $_office_lat ) ? $_office_lat : '' ;
+			$_office_long = ( $_office_long ) ? $_office_long : 'long' ;
+			echo  '<script type="text/javascript">/* <![CDATA[ */ var lat = '.$_office_lat.', long = '.$_office_long.'; /* ]]> */</script>';
 		}
 	}
 
-
-	/**
-	 * Add taxonomy column on edit.php Table
-	 *
-	 * @access public
-	 * @since 1.0
-	 *
-	 * @param array $columns Default table columns
-	 * @return array $columns Updated column array with new taxonomy column
-	 */
-	function add_new_columns($columns) {
-		unset($columns['date']);
-		$columns['ctax_teamdepartment'] = __('Department');
-		$columns['date'] = __('Date');
-		return $columns;
-	}
 
 	/**
 	 * Remove this post type from the Sub Header meta box
@@ -107,7 +75,7 @@ class CPT_Profiles
 	 */
 	public static function register_post_type()
 	{
-		$name = 'Team Member';
+		$name = 'Office';
 		$plural     = $name . 's';
 
 		// Labels
@@ -135,12 +103,12 @@ class CPT_Profiles
 				'exclude_from_search'    => false,
 				'hierarchical'           => true,
 				'show_in_nav_menus'      => false,
-				'menu_icon'              => 'dashicons-id-alt',
+				'menu_icon'              => 'dashicons-location-alt',
 				'supports'               => array('title','editor','excerpt', 'thumbnail'),
 				'register_meta_box_cb'   => array(__CLASS__, 'create_metabox' ),
-				'taxonomies'             => array('ctax_teamdepartment'),
+				'taxonomies'             => array(),
 				'has_archive'            => false,
-				'rewrite'                => array('slug' => 'team-members', 'with_front' => true),
+				'rewrite'                => array('slug' => 'office-locations', 'with_front' => false),
 			)
 		);
 	}
@@ -188,7 +156,7 @@ class CPT_Profiles
 	protected static function _set_meta_box_args()
 	{
 
-		$basename = 'profileinfo';
+		$basename = 'officeinfo';
 		$post_type = get_post_type();
 		$post_types = array(self::POST_TYPE);
 		if( $post_type ){
@@ -204,41 +172,90 @@ class CPT_Profiles
 				'title' => __('Menu Order'),
 				'description' => __( '', 'mcshane' )
 			),
-			'job_title' => array(
-				'name' => 'job_title',
+			'address_street' => array(
+				'name' => 'address_street',
 				'type' => 'text',
 				'default' => '',
-				'title' => __('Job Title'),
-				'description' => __( 'Enter team member&#8217;s job title.', 'mcshane' ),
+				'title' => __('Street Address'),
+				'description' => __( '', 'mcshane' ),
 			),
-			'job_phone' => array(
-				'name' => 'job_phone',
+			'address_city' => array(
+				'name' => 'address_city',
 				'type' => 'text',
 				'default' => '',
-				'title' => __('Telephone Number'),
-				'description' => __( 'Enter team member&#8217;s telephone number.', 'mcshane' ),
+				'title' => __('City'),
+				'description' => __( '', 'mcshane' ),
 			),
-			'job_email' => array(
-				'name' => 'job_email',
+			'address_state' => array(
+				'name' => 'address_state',
 				'type' => 'text',
 				'default' => '',
-				'title' => __('Email Address'),
-				'description' => __( 'Enter team member&#8217;s email address.', 'mcshane' ),
+				'title' => __('State'),
+				'description' => __( '', 'mcshane' ),
 			),
-			'vcard_url' => array(
-				'name' => 'vcard_url',
+			'address_zip' => array(
+				'name' => 'address_zip',
 				'type' => 'text',
 				'default' => '',
-				'title' => __('vCard URL'),
-				'description' => __( 'Enter the URL for this team member&#8217;s vCard.', 'mcshane' ),
+				'title' => __('Zip Code'),
+				'description' => __( '', 'mcshane' ),
 			),
-			'prop_tag' => array(
-				'name' => 'prop_tag',
+			'office_phone' => array(
+				'name' => 'office_phone',
 				'type' => 'text',
 				'default' => '',
-				'title' => __('Property Tag'),
-				'description' => __( 'Enter the tag used to designate this team member&#8217;s representative experience. (e.g., &#8220;jsmith&#8221;)', 'mcshane' ),
-			)		
+				'title' => __('Office Phone #'),
+				'description' => __( '', 'mcshane' ),
+			),
+			'office_fax' => array(
+				'name' => 'office_fax',
+				'type' => 'text',
+				'default' => '',
+				'title' => __('Office Fax #'),
+				'description' => __( '', 'mcshane' ),
+			),
+			'office_email' => array(
+				'name' => 'office_email',
+				'type' => 'text',
+				'default' => '',
+				'title' => __('Office Email'),
+				'description' => __( '', 'mcshane' ),
+			),
+			'office_lat' => array(
+				'name' => 'office_lat',
+				'type' => 'text',
+				'default' => '',
+				'title' => __('Office Latitude'),
+				'description' => __( '', 'mcshane' ),
+			),
+			'office_long' => array(
+				'name' => 'office_long',
+				'type' => 'text',
+				'default' => '',
+				'title' => __('Office Longitude'),
+				'description' => __( '', 'mcshane' ),
+			),
+			'contact_person' => array(
+				'name' => 'contact_person',
+				'type' => 'text',
+				'default' => '',
+				'title' => __('Contact Person'),
+				'description' => __( '', 'mcshane' ),
+			),
+			'contact_position' => array(
+				'name' => 'contact_position',
+				'type' => 'text',
+				'default' => '',
+				'title' => __('Contact Person&#8217;s Title\\Position'),
+				'description' => __( '', 'mcshane' ),
+			),
+			'contact_email' => array(
+				'name' => 'contact_email',
+				'type' => 'text',
+				'default' => '',
+				'title' => __('Contact Person&#8217;s Email'),
+				'description' => __( '', 'mcshane' ),
+			),
 		);
 
 		$args = array(
@@ -291,30 +308,66 @@ class CPT_Profiles
 				$output .= '<input type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="4" /> <span class="desc">'.$meta_field['description'].'</span></p>';
 			}
 
-			if ( 'job_title' === $meta_field['name']) {
+			if ( 'address_street' === $meta_field['name']) {
 				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
 				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
 			}
 
-			if ( 'job_phone' === $meta_field['name']) {
+			if ( 'address_city' === $meta_field['name']) {
 				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
 				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
 			}
 
-			if ( 'job_email' === $meta_field['name']) {
+			if ( 'address_state' === $meta_field['name']) {
 				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
 				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
 			}
 
-			if ( 'vcard_url' === $meta_field['name']) {
+			if ( 'address_zip' === $meta_field['name']) {
 				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
 				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
 			}
 
-			if ( 'prop_tag' === $meta_field['name']) {
+			if ( 'office_phone' === $meta_field['name']) {
 				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
 				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
 			}
+
+			if ( 'office_fax' === $meta_field['name']) {
+				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
+				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
+			}
+
+			if ( 'office_email' === $meta_field['name']) {
+				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
+				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
+			}
+
+			if ( 'office_lat' === $meta_field['name']) {
+				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
+				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
+			}
+
+			if ( 'office_long' === $meta_field['name']) {
+				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
+				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
+			}
+
+			if ( 'contact_person' === $meta_field['name']) {
+				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
+				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
+			}
+
+			if ( 'contact_position' === $meta_field['name']) {
+				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
+				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
+			}
+
+			if ( 'contact_email' === $meta_field['name']) {
+				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
+				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
+			}
+
 		}
 
 		echo $output;
@@ -383,21 +436,8 @@ class CPT_Profiles
 			$data = ( is_array($data) ) ? array_filter($data) : trim($data);
 
 			if ( '' != $data && '-1' != $data  ) {
-
-				// update the _sub_header meta field (it's hidden)
-				if ( 'job_title' === $meta_field['name']) {
-					update_post_meta( $post->ID, '_sub_header', $data );
-				}
-
 				update_post_meta( $post->ID, '_'.$meta_field['name'], $data );
-
 			} else {
-
-				// delete the _sub_header meta field (it's hidden)
-				if ( 'job_title' === $meta_field['name']) {
-					delete_post_meta( $post->ID, '_sub_header');
-				}
-
 				delete_post_meta( $post->ID, '_'.$meta_field['name'] );
 			}
 
@@ -407,66 +447,7 @@ class CPT_Profiles
 
 	 }
 
-
-	/**
-	 * Register Taxonomy
-	 *
-	 * @access public
-	 * @since 1.0
-	 */
-	public function register_taxonomy()
-	{
-
-		$name = 'Team Department';
-		$plural	= $name . 's';
-
-		register_taxonomy(
-			'ctax_teamdepartment',    // Name of taxonomoy
-			self::POST_TYPE,          // Applies to these post types
-			array(
-				'label'                         => _x( $plural, 'taxonomy general name' ),			// A descriptive name for the taxonomy (marked for translation.)
-				'labels'                        => array(
-					'name'                          => _x( $plural, 'taxonomy general name' ),		// The plural form of the name of your taxonomoy shows
-					'singular_name'                 => _x( $name, 'taxonomy general name' ),        // The singular form of the name of your taxonomoy
-					'menu_name'                     => __( $plural),                           		// the menu name text. This string is the name to give menu items. Defaults to value of name
-					'all_items'                     => __( 'All ' . $plural ),                   	// the all items text. Default is __( 'All Tags' ) or __( 'All Categories' )
-					'edit_item'                     => __( 'Edit ' . $name ),                   	// the edit item text. Default is __( 'Edit Tag' ) or __( 'Edit Category' )
-					'view_item'                     => __( 'View ' . $name ),                   	// the view item text. Default is __( 'Edit Tag' ) or __( 'Edit Category' )
-					'update_item'                   => __( 'Update ' . $name ),                     // the update item text. Default is __( 'Update Tag' ) or __( 'Update Category' )
-					'add_new_item'                  => __( 'Add New '. $name ),                   	// the add new item text. Default is __( 'Add New Tag' ) or __( 'Add New Category' )
-					'new_item_name'                 => __( 'New ' . $name ),                    	// the new item name text. Default is __( 'New Tag Name' ) or __( 'New Category Name' )
-					'parent_item'                   => __( 'Parent ' . $name ),                     // the parent item text. This string is not used on non-hierarchical taxonomies such as post tags. Default is null or __( 'Parent Category' )
-					'parent_item_colon'             => __( 'Parent ' . $name.':' ),                 // The same as parent_item, but with colon : in the end null, __( 'Parent Category:' )
-					'search_items'                  => __( 'Parent ' . $plural ),                	// The search items text. Default is __( 'Search Tags' ) or __( 'Search Categories' )
-					#'popular_items'               => __( 'Popular Tags' ),                   		// the popular items text. Default is __( 'Popular Tags' ) or null
-					#'separate_items_with_commas'  => __( 'Separate tags with commas' ),      		// the separate item with commas text used in the taxonomy meta box. Default is __( 'Separate tags with commas' ), or null
-					#'add_or_remove_items'         => __( 'Add or remove tags' ),              		// the add or remove items text and used in the meta box when JavaScript is disabled. This string isn't used on hierarchical taxonomies. Default is __( 'Add or remove tags' ) or null
-					#'choose_from_most_used'       => __( 'Choose from the most used tags' ),  		// the choose from most used text used in the taxonomy meta box. This string isn't used on hierarchical taxonomies. Default is __( 'Choose from the most used tags' ) or null
-					#'not_found'                   => __('menuname')                           		// When no tags are found
-				),
-				'public'                        => true,                                        	// Should this taxonomy be exposed in the admin UI.
-				'show_ui'                       => true,                                       		// Whether to generate a default UI for managing this taxonomy. Default: if not set, defaults to value of public argument
-				'show_in_nav_menus'             => false,                                       	// should taxonomy be available for selection in navigation menus. Default: if not set, defaults to value of public argument
-				'show_tagcloud'                 => false,                                       	// Wether to allow the Tag Cloud widget to use this taxonomy. Default: if not set, defaults to value of show_ui argument
-				#'meta_box_cb'                   => null,                                        	// Provide a callback function name for the meta box display
-				#'show_admin_column'             => false,                                       	// Whether to allow automatic creation of taxonomy columns on associated post-types table
-				'hierarchical'                  => true,                                        	// Is this taxonomy hierarchical (have descendants) like categories or not hierarchical like tags.
-				//'update_count_callback'       => null,
-				'rewrite'                       => array(                                       	// Set to false to prevent rewrite, or array to customize customize query var.
-					'slug'                          => '',                              		    // prepend posts with this slug - defaults to taxonomy's name
-					'with_front'                    => false                                    	// Whether your taxonomy should use the front base from your permalink settings
-				),
-				'query_var'                     => true                                         	// False to prevent queries, or string to customize query var. Default will use $taxonomy as query var
-			)
-		);
-	}
-
-
-
-
-
-
 }
 
 
-$CPT_Profiles = new CPT_Profiles();
+$CPT_Offices = new CPT_Offices();

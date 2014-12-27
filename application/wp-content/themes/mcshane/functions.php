@@ -37,6 +37,12 @@ if ( ! class_exists( '\McShane\Theme_Functions' ) && 'plugins.php' !== $GLOBALS[
 show_admin_bar(false);
 
 /**
+ * Custom Image Sizes
+ */
+add_image_size( 'mcsh-gallery-thumb', 311, 233 );
+
+
+/**
  * Theme Setup
  *
  * Set up theme defaults and registers support for various WordPress features.
@@ -82,23 +88,6 @@ if ( ! function_exists( 'mcshane_theme_setup' ) )
 
 };
 add_action( 'after_setup_theme', 'mcshane_theme_setup' );
-
-
-/**
- * Utility function for debugging variables
- */
-if ( ! function_exists( 'debug' ) ) 
-{
-	function debug($var){
-		echo "\n<pre style=\"text-align:left;\">";
-		if( is_array($var) || is_object($var)){
-			print_r($var);
-		} else {
-			var_dump($var);
-		}
-		echo "</pre>\n";
-	}
-}
 
 
 /**

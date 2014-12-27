@@ -20,9 +20,58 @@ class MetaBox_FeatQuote {
  	 */
 	public function __construct()
 	{
+		add_action( 'init', array($this, 'register_scripts') );
+		add_action( 'admin_enqueue_scripts', array($this, 'add_scripts_backend'), 101 );
+		
 		add_action( 'add_meta_boxes', array($this,'create_metabox') );
 		add_action( 'save_post',      array($this,'save_meta'), 0, 3 );
 	}
+	
+	
+	/**
+	 * Load scripts in the backend
+	 *
+	 * @access  public
+	 * @since   1.0
+	 * @uses wp_enqueue_script()
+	 * @uses wp_localize_script()
+	 */
+	public static function add_scripts_backend($hook)
+	{
+		if( !in_array( $hook, array('post.php', 'post-new.php') ) ){ return; }
+
+		wp_enqueue_script('fq_scripts');
+
+		wp_localize_script(
+			'fq_scripts',
+			'fqJax',
+			array(
+				'ajaxurl' => admin_url( 'admin-ajax.php' )
+			)
+		);
+
+		return;
+	}
+	
+	
+	/**
+	 * Register scripts in the backend
+	 *
+	 * @access  public
+	 * @since   1.0
+	 * @uses wp_register_script()
+	 * @return  void
+	 */
+	public static function register_scripts()
+	{
+		wp_register_script(
+			'fq_scripts',
+			MU_URL  . 'metaboxes/featured-quote/js/script.js',
+			array( 'jquery' ),
+			1.0,
+			true
+		);
+	}	
 	
 
 	/**
@@ -47,8 +96,9 @@ class MetaBox_FeatQuote {
 	 */
 	protected static function _set_meta_box_args()
 	{
-		$basename = 'feat-quote';
+		$basename = 'featquote';
 		$post_type_name = 'post';
+		$post_type_name_lower = '';
 
 		$post_types = get_post_types();
 		$post_type = get_post_type();

@@ -47,9 +47,12 @@ global $post;
 			<hr />
 			<?php the_content();?>
 		<?php endwhile; ?>
-		
+
 		<?php
 		$_tax_terms = get_post_meta(get_the_ID(), '_tax_terms', true);
+		$_p_type = get_post_meta(get_the_ID(), '_p_type', true);
+		$_p_type = ( $_p_type ) ? $_p_type : 'post';
+		
 		if( '' !== $_tax_terms ){
 			$meta_tax = explode(':', $_tax_terms);
 			$selected_tax = $meta_tax[0];
@@ -66,7 +69,7 @@ global $post;
 
 		$r = new WP_Query(
 			array(
-				'post_type'           => 'cpt_profile',
+				'post_type'           => $_p_type,
 				'posts_per_page'      => '-1',
 				'no_found_rows'       => true,
 				'post_status'         => 'publish',
@@ -111,9 +114,9 @@ global $post;
 			</div> <!-- /.gallery -->
 
 		<?php endif; ?>
-		
+
 		<?php wp_reset_postdata(); ?>
-			
+
 	</div> <!-- /.right -->
 
 </div> <!-- /.content -->

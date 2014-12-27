@@ -44,105 +44,130 @@ class Theme_Functions
 	}
 	
 
-function post_gallery( $output, $attr ){
+	/**
+	 * Override Gallery shortcode
+	 
+	 */
+	public function post_gallery( $output, $attr )
+	{
 
-	if( ! isset($attr['tpl']) || empty($attr['tpl']) ){
-		return $output;
-	}
-	
-	$post = get_post();
-
-	if ( ! empty( $attr['ids'] ) ) {
-		// 'ids' is explicitly ordered, unless you specify otherwise.
-		if ( empty( $attr['orderby'] ) ) {
-			$attr['orderby'] = 'post__in';
+		if( ! isset($attr['tpl']) || empty($attr['tpl']) ){
+			return $output;
 		}
-		$attr['include'] = $attr['ids'];
-	}
-	
-	// We're trusting author input, so let's at least make sure it looks like a valid orderby statement
-	if ( isset( $attr['orderby'] ) ) {
-		$attr['orderby'] = sanitize_sql_orderby( $attr['orderby'] );
-		if ( ! $attr['orderby'] ) {
-			unset( $attr['orderby'] );
-		}
-	}
-	
-	$html5 = current_theme_supports( 'html5', 'gallery' );
-	
-	$atts = shortcode_atts( array(
-		'order'      => 'ASC',
-		'orderby'    => 'menu_order ID',
-		'id'         => $post ? $post->ID : 0,
-		'itemtag'    => $html5 ? 'figure'     : 'dl',
-		'icontag'    => $html5 ? 'div'        : 'dt',
-		'captiontag' => $html5 ? 'figcaption' : 'dd',
-		'columns'    => 3,
-		'size'       => 'full',
-		'include'    => '',
-		'exclude'    => '',
-		'link'       => ''
-	), $attr, 'gallery' );
-	
-	$id = intval( $atts['id'] );
-	
-	if ( 'RAND' == $atts['order'] ) {
-		$atts['orderby'] = 'none';
-	}
-	
-	if ( ! empty( $atts['include'] ) ) {
-		$_attachments = get_posts( array( 'include' => $atts['include'], 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $atts['order'], 'orderby' => $atts['orderby'] ) );
-
-		$attachments = array();
-		foreach ( $_attachments as $key => $val ) {
-			$attachments[$val->ID] = $_attachments[$key];
-		}
-	} elseif ( ! empty( $atts['exclude'] ) ) {
-		$attachments = get_children( array( 'post_parent' => $id, 'exclude' => $atts['exclude'], 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $atts['order'], 'orderby' => $atts['orderby'] ) );
-	} else {
-		$attachments = get_children( array( 'post_parent' => $id, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $atts['order'], 'orderby' => $atts['orderby'] ) );
-	}
-	
-	if ( empty( $attachments ) ) {
-		return '';
-	}
-	
-	if ( is_feed() ) {
-		$output = "\n";
-		foreach ( $attachments as $att_id => $attachment ) {
-			$output .= wp_get_attachment_link( $att_id, $atts['size'], true ) . "\n";
-		}
-		return $output;
-	}
-	
-	
-	// are we building the front page hero gallery?	
-	if( 'home-hero' == $attr['tpl'] ) {
 		
-		$output = '<ul class="hero-slider">';
-			
-			foreach ( $attachments as $id => $attachment ) {
-				$image_obj = wp_get_attachment_image_src( $id, $atts['size'], false );
-				$img_src = $image_obj[0];
-				$iw = $image_obj[1];
-				$ih = $image_obj[2];				
-				$image_meta  = wp_get_attachment_metadata( $id );
-				
-				$output .= '<li>';
-					$output .= '<img src="'.$img_src.'" class="background-cover" width="'.$iw.'" height="'.$ih.'" alt="" /> <img src="' . get_template_directory_uri() . '/images/hero-shadow.png" class="hero-shadow" alt="" />';
-					$output .= '<div class="container">';
-						$output .= '<div class="slide-copy">' . wptexturize($attachment->post_excerpt) . '</div>';
-					$output .= '</div>';
-				$output .= '</li>';
+		$post = get_post();
+
+		if ( ! empty( $attr['ids'] ) ) {
+			// 'ids' is explicitly ordered, unless you specify otherwise.
+			if ( empty( $attr['orderby'] ) ) {
+				$attr['orderby'] = 'post__in';
 			}
-			
-		$output .= '</ul>';		
+			$attr['include'] = $attr['ids'];
+		}
 		
+		// We're trusting author input, so let's at least make sure it looks like a valid orderby statement
+		if ( isset( $attr['orderby'] ) ) {
+			$attr['orderby'] = sanitize_sql_orderby( $attr['orderby'] );
+			if ( ! $attr['orderby'] ) {
+				unset( $attr['orderby'] );
+			}
+		}
+		
+		$html5 = current_theme_supports( 'html5', 'gallery' );
+		
+		$atts = shortcode_atts( array(
+			'order'      => 'ASC',
+			'orderby'    => 'menu_order ID',
+			'id'         => $post ? $post->ID : 0,
+			'itemtag'    => $html5 ? 'figure'     : 'dl',
+			'icontag'    => $html5 ? 'div'        : 'dt',
+			'captiontag' => $html5 ? 'figcaption' : 'dd',
+			'columns'    => 3,
+			'size'       => 'full',
+			'include'    => '',
+			'exclude'    => '',
+			'link'       => ''
+		), $attr, 'gallery' );
+		
+		$id = intval( $atts['id'] );
+		
+		if ( 'RAND' == $atts['order'] ) {
+			$atts['orderby'] = 'none';
+		}
+		
+		if ( ! empty( $atts['include'] ) ) {
+			$_attachments = get_posts( array( 'include' => $atts['include'], 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $atts['order'], 'orderby' => $atts['orderby'] ) );
+
+			$attachments = array();
+			foreach ( $_attachments as $key => $val ) {
+				$attachments[$val->ID] = $_attachments[$key];
+			}
+		} elseif ( ! empty( $atts['exclude'] ) ) {
+			$attachments = get_children( array( 'post_parent' => $id, 'exclude' => $atts['exclude'], 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $atts['order'], 'orderby' => $atts['orderby'] ) );
+		} else {
+			$attachments = get_children( array( 'post_parent' => $id, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $atts['order'], 'orderby' => $atts['orderby'] ) );
+		}
+		
+		if ( empty( $attachments ) ) {
+			return '';
+		}
+		
+		if ( is_feed() ) {
+			$output = "\n";
+			foreach ( $attachments as $att_id => $attachment ) {
+				$output .= wp_get_attachment_link( $att_id, $atts['size'], true ) . "\n";
+			}
+			return $output;
+		}
+		
+		
+		// are we building the front page hero gallery?	
+		if( 'home-hero' == $attr['tpl'] ) {
+			
+			$output = '<ul class="hero-slider">';
+				
+				foreach ( $attachments as $id => $attachment ) {
+					$image_obj = wp_get_attachment_image_src( $id, $atts['size'], false );
+					$img_src = $image_obj[0];
+					$iw = $image_obj[1];
+					$ih = $image_obj[2];				
+					$image_meta  = wp_get_attachment_metadata( $id );
+					
+					$output .= '<li>';
+						$output .= '<img src="'.$img_src.'" class="background-cover" width="'.$iw.'" height="'.$ih.'" alt="" /> <img src="' . get_template_directory_uri() . '/images/hero-shadow.png" class="hero-shadow" alt="" />';
+						$output .= '<div class="container">';
+							$output .= '<div class="slide-copy">' . wptexturize($attachment->post_excerpt) . '</div>';
+						$output .= '</div>';
+					$output .= '</li>';
+				}
+				
+			$output .= '</ul>';		
+			
+		}
+		
+		
+		// are we building grid gallery?	
+		if( 'grid' == $attr['tpl'] ) {
+			
+			$output = ' <div class="gallery clearfix"><ul>';
+				
+				foreach ( $attachments as $id => $attachment ) {
+					$image_obj = wp_get_attachment_image_src( $id, $atts['size'], false );
+					$img_src = $image_obj[0];
+					$iw = $image_obj[1];
+					$ih = $image_obj[2];								
+					$output .= '<li>';
+						$output .= '<a href="#"><img src="'.$img_src.'" class="background-cover" width="'.$iw.'" height="'.$ih.'" alt="" /></a>';		
+					$output .= '</li>';
+				}
+				
+			$output .= '</ul></div>';		
+			
+		}	
+
+		return $output;
+
 	}
-
-	return $output;
-
-}
 	
 	
 	/**
@@ -150,7 +175,7 @@ function post_gallery( $output, $attr ){
 	 * 
 	 * @since McShane 1.0
 	 */
-	function widgets_init() 
+	public function widgets_init() 
 	{	
 	
 		register_sidebar( array(

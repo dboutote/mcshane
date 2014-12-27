@@ -128,9 +128,8 @@ class CPT_Galleries
 									}; ?>
 									<img src="<?php echo $img_src;?>" class="background-cover" width="<?php echo $iw;?>" height="<?php echo $ih;?>" />
 									<span class="title">
-										<strong><?php echo $the_title; ?></strong>
-										<br />
-										<?php if( has_subheader($id) ) { display_subheader($id); } ?>
+										<strong><?php echo $the_title; ?></strong>										
+										<?php if( has_subheader($id) ) { ?> <br /> <?php display_subheader($id); } ?>
 									</span>
 								</a>
 							</li>

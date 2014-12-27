@@ -31,6 +31,13 @@ class CTax_MetaFields
 		add_action( 'create_ctax_teamdepartment', array($this,'save_taxonomy_meta'), 10, 2 );
 		add_action( 'edited_ctax_teamdepartment', array($this,'save_taxonomy_meta'), 10, 2 );
 		add_action( 'delete_ctax_teamdepartment', array($this,'delete_taxonomy_meta'), 10, 3 );
+		
+		add_action( 'ctax_newstype_add_form_fields', array($this,'add_new_meta_field'), 10, 2 );
+		add_action( 'ctax_newstype_edit_form_fields', array($this,'edit_meta_field'), 10, 2 );
+		add_action( 'create_ctax_newstype', array($this,'save_taxonomy_meta'), 10, 2 );
+		add_action( 'edited_ctax_newstype', array($this,'save_taxonomy_meta'), 10, 2 );
+		add_action( 'delete_ctax_newstype', array($this,'delete_taxonomy_meta'), 10, 3 );		
+		
 		add_action( 'get_terms', array($this,'get_terms'), 10, 3 );
 		
 	}

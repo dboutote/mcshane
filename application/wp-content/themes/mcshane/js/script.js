@@ -235,7 +235,7 @@ $(document).ready(function() {
 		  var marker = new google.maps.Marker({
 			  position: location,
 			  map: map,
-			  icon: 'images/map-marker.svg'
+			  icon: mc_scripts.theme_images_url + 'map-marker.svg'
 		  });
 		
 		  var customMapType = new google.maps.StyledMapType(featureOpts, styledMapOptions);

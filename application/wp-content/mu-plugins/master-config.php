@@ -44,19 +44,19 @@ function get_files($dir_path) {
 }
 
 // include needed functions
-#include(MU_INC_DIR . '/mstr-functions.php');
+include( MU_INC_DIR . '/mstr-functions.php' );
 
 // include any custom widgets
-include( MU_WIDGETS_DIR . '/widgets-init.php');
+include( MU_WIDGETS_DIR . '/widgets-init.php' );
 
 // include any custom meta boxes
-include( MU_METABOX_DIR . '/meta-init.php');
+include( MU_METABOX_DIR . '/meta-init.php' );
 
 // include any custom post types
-include( MU_CPT_DIR . '/cpt-init.php');
+include( MU_CPT_DIR . '/cpt-init.php' );
 
 // include any custom taxonomies
-include( MU_TAX_DIR . '/tax-init.php');
+include( MU_TAX_DIR . '/tax-init.php' );
 
 
 
@@ -70,6 +70,9 @@ remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0);
 #remove_filter( 'the_content', 'wpautop' );
 #add_filter( 'the_content', 'wpautop' , 999);
 add_filter( 'the_content', 'shortcode_unautop',9999 );
+
+
+
 
 
 
