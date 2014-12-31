@@ -48,6 +48,7 @@ global $post;
 		<?php while ( have_posts() ) : the_post(); ?>
 			<h2><?php the_title();?></h2>
 			<?php the_content();?>
+			<?php edit_post_link( __( 'Edit', 'mcshane' ), '<span class="edit-link">', '</span>' );?>
 		<?php endwhile; ?>
 
 	</div> <!-- /.right -->

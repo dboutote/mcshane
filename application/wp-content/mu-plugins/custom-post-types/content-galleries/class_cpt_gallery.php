@@ -44,6 +44,24 @@ class CPT_Galleries
 		add_action( 'wp_ajax_setup_gallery_new_posts', array($this, 'get_new_posts') );
 		#add_filter( 'the_content',  array($this,'process_shortcodes'), 7 );
 		add_shortcode( 'content_gallery', array($this, 'content_gallery') );
+		add_action( 'after_gallery_item_title', array($this, 'display_gallery_item_subheader'), 10, 1 );
+	}
+	
+	/**
+	 * Display a gallery item Sub Header
+	 * 
+	 * @access  public
+	 * @since   1.0
+	 */
+	public function display_gallery_item_subheader( $_gallery_item )
+	{
+		$id = (int)$_gallery_item['ID'];
+		if( has_subheader($id) ){
+			echo '<br />';
+			display_subheader($id);
+		}
+		
+		return $_gallery_item;
 	}
 
 
@@ -57,7 +75,7 @@ class CPT_Galleries
 	function process_shortcodes($content)
 	{
 		global $shortcode_tags;
-		
+
 		$orig_shortcode_tags = $shortcode_tags;
 		$shortcode_tags      = array();
 
@@ -71,7 +89,7 @@ class CPT_Galleries
 		return $content;
 	}
 
-	
+
 	/**
 	 * Process the content_gallery Shortcode
 	 *
@@ -98,10 +116,11 @@ class CPT_Galleries
 		if( !is_null($post_object) ){
 
 			$_gallery_items = get_post_meta($id, '_gallery_items', true);
+
 			$gallery_title = $post_object->post_title;
 			$gallery_title_class = sanitize_title($gallery_title);
 
-			if( is_array($_gallery_items) && count($_gallery_items) > 1 ) {
+			if( is_array($_gallery_items) && count($_gallery_items) > 0 ) {
 
 				usort($_gallery_items, function($a, $b) {
 					return $a['order'] - $b['order'];
@@ -129,7 +148,7 @@ class CPT_Galleries
 									<img src="<?php echo $img_src;?>" class="background-cover" width="<?php echo $iw;?>" height="<?php echo $ih;?>" />
 									<span class="title">
 										<strong><?php echo $the_title; ?></strong>										
-										<?php if( has_subheader($id) ) { ?> <br /> <?php display_subheader($id); } ?>
+										<?php do_action('after_gallery_item_title', $_gallery_item); ?>
 									</span>
 								</a>
 							</li>

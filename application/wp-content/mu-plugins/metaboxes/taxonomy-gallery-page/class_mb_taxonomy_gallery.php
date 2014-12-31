@@ -277,7 +277,6 @@ class MetaBox_TaxonomyGallery {
 			wp_nonce_field( plugin_basename(__CLASS__), $meta_field['name'].'_noncename' );
 			
 			if( 'p_type' === $meta_field['name'] ) {
-			debug($meta_field_value);
 
 				// sort alphabetically
 				asort($post_types);

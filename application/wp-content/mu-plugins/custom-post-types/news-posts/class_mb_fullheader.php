@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Sub-Header Metabox
+ * MetaBox_FullHeader meta box class
  *
- * Adds an optional sub header field to the Editor screen
+ * Adds an optional full header field to the Editor screen on cpt_news post types
  *
  */
-class MetaBox_SubHeader {
+class MetaBox_FullHeader {
 
 	private $meta_config_args;
 	private $dont_show_in = array();
@@ -20,42 +20,31 @@ class MetaBox_SubHeader {
  	 */
 	public function __construct()
 	{
-		add_action( 'add_meta_boxes', array($this,'create_metabox') );
+		add_action( 'add_meta_boxes_cpt_news', array($this,'create_metabox') );
 		add_action( 'save_post',      array($this,'save_meta'), 0, 3 );
 		add_action( 'edit_form_after_title', array($this,'move_meta_box') );
 	}
-	
-	
+
+
 	/**
-	 * This will move the meta box to under the Editor Title field 
+	 * This will move the meta box to under the Editor Title field
 	 */
 	public static function move_meta_box()
 	{
-	
-		global $wp_meta_boxes;
-		#debug($wp_meta_boxes);
-	
-		#$post_type_check = 'cpt_guide';
-		
-		#if( $post_type_check === get_post_type() ){	
-				
-			global $post;			
-						
-			# Get the globals:
-			global $post, $wp_meta_boxes;
 
-			# Output the "advanced" meta boxes:
-			do_meta_boxes(get_current_screen(), 'advancedtwo', $post);
-			
-			# Remove the initial "advanced" meta boxes:
-			#unset($wp_meta_boxes[$post_type_check]['advanced']);
-		
-		#}
-		
+		global $wp_meta_boxes;
+
+		global $post;
+
+		# Get the globals:
+		global $post, $wp_meta_boxes;
+
+		# Output the "advanced" meta boxes:
+		do_meta_boxes(get_current_screen(), 'advancedcpt_news', $post);
+
 		return;
-		
 	}
-	
+
 
 	/**
 	 * Configuration params for the Metabox
@@ -79,7 +68,7 @@ class MetaBox_SubHeader {
 	 */
 	protected function set_meta_box_args()
 	{
-		$basename = 'sub-header';
+		$basename = 'full-header';
 		$post_type_name = 'post';
 
 		$post_types = get_post_types();
@@ -90,23 +79,23 @@ class MetaBox_SubHeader {
 		}
 
 		$meta_fields = array(
-			'sub_header' => array(
-				'name' => 'sub_header',
+			'full_header' => array(
+				'name' => 'full_header',
 				'type' => 'textarea',
 				'default' => '',
-				'title' => apply_filters( 'mb_subheader_metabox_title', 'Sub Header'),
-				'description' => apply_filters( 'mb_subheader_metabox_description', sprintf( __( 'Enter an optional sub header for this %s.', 'rinsight' ), $post_type_name )),
+				'title' => apply_filters( 'mb_fullheader_metabox_title', 'Full Title'),
+				'description' => apply_filters( 'mb_fullheader_metabox_description', sprintf( __( 'Enter an optional full title for this %s.', 'rinsight' ), $post_type_name )),
 			)
 		);
 
 		$args = array(
 			'meta_box_id' => $basename . 'div',
 			'meta_box_name' => $basename . 'info',
-			'meta_box_title' => __( 'Sub Header' ),
+			'meta_box_title' => __( 'Full Title' ),
 			'meta_box_default' => '',
-			'meta_box_description' => sprintf( __( 'Enter an optional sub header for this %s.', 'rinsight' ), $post_type_name ),
+			'meta_box_description' => sprintf( __( 'Enter an optional full title for this %s.', 'rinsight' ), $post_type_name ),
 			'content_types' => $post_types,
-			'meta_box_position' => 'advancedtwo',
+			'meta_box_position' => 'advancedcpt_news',
 			'meta_box_priority' => 'high',
 			'meta_fields' => $meta_fields
 		);
@@ -125,7 +114,7 @@ class MetaBox_SubHeader {
 	 */
 	public function create_metabox()
 	{
-	
+
 		if( false === $this->show_in_posttype(get_post_type()) ){
 			return;
 		};
@@ -154,7 +143,7 @@ class MetaBox_SubHeader {
 			return false;
 		}
 
-		if ( in_array( $post_type, apply_filters( 'include_subheader_dont_show_list', $this->dont_show_in, $post_type ) ) ){
+		if ( in_array( $post_type, apply_filters( 'include_fullheader_dont_show_list', $this->dont_show_in, $post_type ) ) ){
 			return false;
 		}
 
@@ -178,9 +167,9 @@ class MetaBox_SubHeader {
 		extract($args);
 
 		$output = '';
-		
-		$output .= '<style type="text/css" media="screen">#sub-headerdiv { margin-top: 24px; } #sub-headerdiv .handlediv, #sub-headerdiv .hndle {display:none;}</style>';
-		
+
+		$output .= '<style type="text/css" media="screen">#full-headerdiv { margin-top: 24px; } #full-headerdiv .handlediv, #full-headerdiv .hndle {display:none;}</style>';
+
 		foreach( $meta_fields as $meta_field ) {
 
 			$meta_field_value = get_post_meta($post->ID, '_'.$meta_field['name'], true);
@@ -191,7 +180,7 @@ class MetaBox_SubHeader {
 
 			wp_nonce_field( plugin_basename(__CLASS__), $meta_field['name'].'_noncename' );
 
-			if ( 'sub_header' === $meta_field['name']) {
+			if ( 'full_header' === $meta_field['name']) {
 				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
 				$output .= $meta_field['description'] . '<br />';
 				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 98%; padding: 6px 8px; " /></p>';
@@ -200,7 +189,7 @@ class MetaBox_SubHeader {
 		}
 
 		echo $output;
-		
+
 		return;
 
 	}
@@ -286,24 +275,22 @@ class MetaBox_SubHeader {
 
 
 /**
- * Check if post has Sub Header
+ * Check if post has Full Header
  *
  * @since 1.0
  *
  * @param int $post_id Optional. Post ID.
  * @return bool
  */
-function has_subheader( $post_id = null ) {
+function has_fullheader( $post_id = null ) {
 	$post_id = ( null === $post_id ) ? get_the_ID() : $post_id;
-	return (bool) get_post_meta( $post_id, '_sub_header', true );
+	return (bool) get_post_meta( $post_id, '_full_header', true );
 }
 
 
-function display_subheader( $post_id = null ){
+function display_fullheader( $post_id = null ){
 	$post_id = ( null === $post_id ) ? get_the_ID() : $post_id;
-	$content = get_post_meta( $post_id, '_sub_header', true );
+	$content = get_post_meta( $post_id, '_full_header', true );
 
 	echo $content;
 }
-
-$MetaBox_SubHeader = new MetaBox_SubHeader();

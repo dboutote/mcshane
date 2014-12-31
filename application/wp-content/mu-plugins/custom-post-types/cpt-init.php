@@ -19,4 +19,7 @@ include_once( dirname( __FILE__ ) . '/class_cpt_cause.php' );
 include_once( dirname( __FILE__ ) . '/class_cpt_office.php' );
 
 // Call the News Post Type
-include_once( dirname( __FILE__ ) . '/class_cpt_news.php' );
+include_once( dirname( __FILE__ ) . '/news-posts/class_cpt_news.php' );
+
+// Call the Property Post Type
+include_once( dirname( __FILE__ ) . '/class_cpt_property.php' );

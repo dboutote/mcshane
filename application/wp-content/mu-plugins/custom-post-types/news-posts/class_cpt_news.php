@@ -140,7 +140,7 @@ class CPT_News
 				'exclude_from_search'    => false,
 				'hierarchical'           => true,
 				'show_in_nav_menus'      => false,
-				'menu_icon'              => 'dashicons-megaphone',
+				'menu_icon'              => 'dashicons-welcome-widgets-menus',
 				'supports'               => array('title','editor','excerpt', 'thumbnail'),
 				'register_meta_box_cb'   => array(__CLASS__, 'create_metabox' ),
 				'taxonomies'             => array(self::TAX_NAME),
@@ -413,3 +413,8 @@ class CPT_News
 
 
 $CPT_News = new CPT_News();
+
+// Call the Full Header meta box
+include_once( dirname( __FILE__ ) . '/class_mb_fullheader.php' );
+
+$MetaBox_FullHeader = new MetaBox_FullHeader();

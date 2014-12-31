@@ -140,7 +140,7 @@ class MetaBox_FeatQuote {
 			'meta_box_description' => sprintf( __( 'Enter an optional testimonial/quote for this %s.', 'mcshane' ), $post_type_name_lower ),
 			'content_types' => $post_types,
 			'meta_box_position' => 'side',
-			'meta_box_priority' => 'high',
+			'meta_box_priority' => 'low',
 			'meta_fields' => $meta_fields
 		);
 
@@ -168,7 +168,7 @@ class MetaBox_FeatQuote {
 
 		if ( function_exists('add_meta_box') ) {
 			foreach ($content_types as $content_type) {
-				add_meta_box($meta_box_id, $meta_box_title, array($this, 'inner_metabox'), $content_type, $meta_box_position );
+				add_meta_box($meta_box_id, $meta_box_title, array($this, 'inner_metabox'), $content_type, $meta_box_position, $meta_box_priority );
 			}
 		}
 	}

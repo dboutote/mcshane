@@ -45,7 +45,7 @@ global $post;
 				<h1><?php echo get_post( $post->post_parent )->post_title;?></h1>
 			<?php } ?>
 			<hr />
-			<?php the_content();?>
+			<?php the_content();?>			
 		<?php endwhile; ?>
 
 		<?php
@@ -116,6 +116,8 @@ global $post;
 		<?php endif; ?>
 
 		<?php wp_reset_postdata(); ?>
+		
+		<?php edit_post_link( __( 'Edit', 'mcshane' ), '<span class="edit-link">', '</span>' );?>
 
 	</div> <!-- /.right -->
 

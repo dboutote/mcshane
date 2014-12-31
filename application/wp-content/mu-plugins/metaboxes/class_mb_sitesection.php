@@ -1,12 +1,13 @@
 <?php
 
 /**
- * Sub-Header Metabox
+ * MetaBox_SiteSection Meta Box Class
  *
- * Adds an optional sub header field to the Editor screen
+ * Adds a required dropdown on all non-Page post types to indicate where in the site hierarchy the content should appear.
+ * Used for breadcrumb and side navigation.
  *
  */
-class MetaBox_SubHeader {
+class MetaBox_SiteSection {
 
 	private $meta_config_args;
 	private $dont_show_in = array();
@@ -22,40 +23,37 @@ class MetaBox_SubHeader {
 	{
 		add_action( 'add_meta_boxes', array($this,'create_metabox') );
 		add_action( 'save_post',      array($this,'save_meta'), 0, 3 );
-		add_action( 'edit_form_after_title', array($this,'move_meta_box') );
 	}
-	
-	
-	/**
-	 * This will move the meta box to under the Editor Title field 
-	 */
-	public static function move_meta_box()
-	{
-	
-		global $wp_meta_boxes;
-		#debug($wp_meta_boxes);
-	
-		#$post_type_check = 'cpt_guide';
-		
-		#if( $post_type_check === get_post_type() ){	
-				
-			global $post;			
-						
-			# Get the globals:
-			global $post, $wp_meta_boxes;
 
-			# Output the "advanced" meta boxes:
-			do_meta_boxes(get_current_screen(), 'advancedtwo', $post);
-			
-			# Remove the initial "advanced" meta boxes:
-			#unset($wp_meta_boxes[$post_type_check]['advanced']);
-		
-		#}
-		
-		return;
-		
+
+	/**
+	 * Get a list of all top-level pages
+	 *
+	 * @access  protected
+	 * @since   1.0
+	 * @return  array $pages 
+ 	 */
+	protected static function _get_pages()
+	{
+		global $wpdb;
+		$pages = $wpdb->get_results(
+			$wpdb->prepare(
+				"
+				SELECT ID, post_title
+				FROM $wpdb->posts
+				WHERE post_status = 'publish'
+				AND post_type = %s
+				AND post_parent = %d
+				ORDER BY menu_order ASC
+				",
+				'page',
+				0
+			)
+		);
+
+		return $pages;
 	}
-	
+
 
 	/**
 	 * Configuration params for the Metabox
@@ -64,9 +62,9 @@ class MetaBox_SubHeader {
 	 * @access protected
 	 *
 	 */
-	protected function get_meta_box_args()
+	protected static function _get_meta_box_args()
 	{
-		return $this->set_meta_box_args();
+		return self::_set_meta_box_args();
 	}
 
 
@@ -77,36 +75,38 @@ class MetaBox_SubHeader {
 	 * @since 1.0
 	 *
 	 */
-	protected function set_meta_box_args()
+	protected static function _set_meta_box_args()
 	{
-		$basename = 'sub-header';
+		$basename = 'sitesection';
 		$post_type_name = 'post';
+		$post_type_name_lower = '';
 
 		$post_types = get_post_types();
 		$post_type = get_post_type();
 
 		if( $post_type ){
-			$post_type_name = strtolower( get_post_type_object( $post_type )->labels->singular_name );
+			$post_type_name =  get_post_type_object( $post_type )->labels->singular_name;
+			$post_type_name_lower = strtolower($post_type_name);
 		}
 
 		$meta_fields = array(
-			'sub_header' => array(
-				'name' => 'sub_header',
-				'type' => 'textarea',
+			'site_section' => array(
+				'name' => 'site_section',
+				'type' => 'select',
 				'default' => '',
-				'title' => apply_filters( 'mb_subheader_metabox_title', 'Sub Header'),
-				'description' => apply_filters( 'mb_subheader_metabox_description', sprintf( __( 'Enter an optional sub header for this %s.', 'rinsight' ), $post_type_name )),
-			)
+				'title' => __('Site Section'),
+				'description' => sprintf( __( 'Select the Site Section for this %s. <em>(Used for site navigation.)</em>', 'mcshane' ), $post_type_name_lower ),
+			),
 		);
 
 		$args = array(
 			'meta_box_id' => $basename . 'div',
 			'meta_box_name' => $basename . 'info',
-			'meta_box_title' => __( 'Sub Header' ),
+			'meta_box_title' => __( 'Site Section' ),
 			'meta_box_default' => '',
-			'meta_box_description' => sprintf( __( 'Enter an optional sub header for this %s.', 'rinsight' ), $post_type_name ),
+			'meta_box_description' => sprintf( __( 'Select the Site Section for this %s.', 'mcshane' ), $post_type_name_lower ),
 			'content_types' => $post_types,
-			'meta_box_position' => 'advancedtwo',
+			'meta_box_position' => 'side',
 			'meta_box_priority' => 'high',
 			'meta_fields' => $meta_fields
 		);
@@ -125,12 +125,16 @@ class MetaBox_SubHeader {
 	 */
 	public function create_metabox()
 	{
-	
+
+		if( 'page' === get_post_type() ){
+			return;
+		}
+
 		if( false === $this->show_in_posttype(get_post_type()) ){
 			return;
 		};
 
-		$args = $this->get_meta_box_args();
+		$args = $this->_get_meta_box_args();
 		extract($args);
 
 		if ( function_exists('add_meta_box') ) {
@@ -154,7 +158,7 @@ class MetaBox_SubHeader {
 			return false;
 		}
 
-		if ( in_array( $post_type, apply_filters( 'include_subheader_dont_show_list', $this->dont_show_in, $post_type ) ) ){
+		if ( in_array( $post_type, apply_filters( 'include_sitesection_dont_show_list', $this->dont_show_in, $post_type ) ) ){
 			return false;
 		}
 
@@ -167,20 +171,17 @@ class MetaBox_SubHeader {
 	 *
 	 * @access public
 	 * @since 1.0
-	 *
 	 */
-	public function inner_metabox()
+	public static function inner_metabox()
 	{
 		global $post;
 
 		// get configuration args
-		$args = $this->get_meta_box_args();
+		$args = self::_get_meta_box_args();
 		extract($args);
 
 		$output = '';
-		
-		$output .= '<style type="text/css" media="screen">#sub-headerdiv { margin-top: 24px; } #sub-headerdiv .handlediv, #sub-headerdiv .hndle {display:none;}</style>';
-		
+
 		foreach( $meta_fields as $meta_field ) {
 
 			$meta_field_value = get_post_meta($post->ID, '_'.$meta_field['name'], true);
@@ -190,17 +191,25 @@ class MetaBox_SubHeader {
 			}
 
 			wp_nonce_field( plugin_basename(__CLASS__), $meta_field['name'].'_noncename' );
+			
+			if ( 'site_section' === $meta_field['name']) {
+				$pages = self::_get_pages();				
+				$options = '<option value="-1">-- Select a Site Section --</option>';
+				if( count($pages) > 0 ){
+					foreach( $pages as $p ){
+						$selected = ( (int)$p->ID === (int) $meta_field_value) ? 'selected="selected"' : '';
+						$options .= "<option value='".$p->ID."' {$selected} >".$p->post_title."</option>";		
+					}
+				}
 
-			if ( 'sub_header' === $meta_field['name']) {
-				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
-				$output .= $meta_field['description'] . '<br />';
-				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 98%; padding: 6px 8px; " /></p>';
+				$output .= '<p><label for="'.$meta_field['name'].'">'.$meta_field['description'].'</label><br />';				
+				$output .= '<select class="widefat" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'">'.$options.'</select></p>';
 			}
 
 		}
 
 		echo $output;
-		
+
 		return;
 
 	}
@@ -251,7 +260,7 @@ class MetaBox_SubHeader {
 		}
 
 		// get configuration args
-		$args = $this->get_meta_box_args();
+		$args = $this->_get_meta_box_args();
 
 		extract($args);
 
@@ -280,30 +289,4 @@ class MetaBox_SubHeader {
 
 }
 
-
-
-
-
-
-/**
- * Check if post has Sub Header
- *
- * @since 1.0
- *
- * @param int $post_id Optional. Post ID.
- * @return bool
- */
-function has_subheader( $post_id = null ) {
-	$post_id = ( null === $post_id ) ? get_the_ID() : $post_id;
-	return (bool) get_post_meta( $post_id, '_sub_header', true );
-}
-
-
-function display_subheader( $post_id = null ){
-	$post_id = ( null === $post_id ) ? get_the_ID() : $post_id;
-	$content = get_post_meta( $post_id, '_sub_header', true );
-
-	echo $content;
-}
-
-$MetaBox_SubHeader = new MetaBox_SubHeader();
+$MetaBox_SiteSection = new MetaBox_SiteSection();

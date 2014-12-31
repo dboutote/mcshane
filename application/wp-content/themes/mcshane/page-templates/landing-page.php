@@ -64,16 +64,13 @@ get_header(); ?>
 		<div class="landing-content">
 			<?php while ( have_posts() ) : the_post(); ?>	
 				<h2><?php the_title();?></h2>
-				<?php the_content();?>				
+				<?php the_content();?>	
+				<?php edit_post_link( __( 'Edit', 'mcshane' ), '<span class="edit-link">', '</span>' );?>				
 			<?php endwhile; ?>
 		</div><!-- /.landing-content -->
 	</div> <!-- /.right -->
 
-
 </div> <!-- /.content -->
-
-
-
 
 <?php
 get_footer();

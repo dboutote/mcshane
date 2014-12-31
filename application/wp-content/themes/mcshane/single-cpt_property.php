@@ -9,7 +9,7 @@
 global $post;
 $post_type = get_post_type_object( get_post_type() );
 $postid = get_the_ID();
-$_tax = 'ctax_teamdepartment';
+$_tax = 'ctax_proptype';
 
 $_terms = wp_get_object_terms( $postid,  $_tax );
 $parent_tax_name = ( !is_wp_error($_terms) && count($_terms) > 0 ) ? $_terms[0]->name : '' ;
@@ -63,7 +63,7 @@ get_header(); ?>
 	
 		<?php 
 		// post meta
-		$_job_title = get_post_meta($postid, '_job_title', true);
+		$_property_location = get_post_meta($postid, '_property_location', true);
 		$_job_phone = get_post_meta($postid, '_job_phone', true);
 		$_job_email = get_post_meta($postid, '_job_email', true);
 		$_vcard_url = get_post_meta($postid, '_vcard_url', true);
