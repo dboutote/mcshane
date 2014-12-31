@@ -227,18 +227,18 @@ class CPT_Properties
 				'title' => __('Property Location'),
 				'description' => __( 'City, ST', 'mcshane' ),
 			),
-			'address_city' => array(
-				'name' => 'address_city',
+			'project_url' => array(
+				'name' => 'project_url',
 				'type' => 'text',
 				'default' => '',
-				'title' => __('City'),
+				'title' => __('Project URL'),
 				'description' => __( '', 'mcshane' ),
 			),
-			'address_state' => array(
-				'name' => 'address_state',
+			'project_url_text' => array(
+				'name' => 'project_url_text',
 				'type' => 'text',
 				'default' => '',
-				'title' => __('State'),
+				'title' => __('Project URL Text'),
 				'description' => __( '', 'mcshane' ),
 			),
 			'address_zip' => array(
@@ -318,6 +318,16 @@ class CPT_Properties
 				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
 				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
 			}
+			
+			if ( 'project_url' === $meta_field['name']) {
+				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
+				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
+			}
+
+			if ( 'project_url_text' === $meta_field['name']) {
+				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
+				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
+			}			
 			/*
 			if ( 'latitude' === $meta_field['name']) {
 				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
@@ -518,5 +528,20 @@ class CPT_Properties
 	 
 }
 
+
+function mcsh_get_property_photos( $post_id = null ) {
+	$post_id = ( null === $post_id ) ? get_the_ID() : $post_id;
+	$attachments = get_children(
+		array(
+			'post_parent' => $id, 
+			'post_status' => 'inherit', 
+			'post_type' => 'attachment', 
+			'post_mime_type' => 'image',
+		) 
+	);
+	
+	return $attachments;
+
+}
 
 $CPT_Properties = new CPT_Properties();

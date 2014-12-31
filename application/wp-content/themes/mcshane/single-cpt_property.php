@@ -19,6 +19,31 @@ $_site_section = get_post_meta($postid, '_site_section', true);
 if($_site_section){
 	$site_section = get_post($_site_section);
 }
+
+// post meta
+$_property_location = get_post_meta($postid, '_property_location', true);
+$_sub_header = get_post_meta($postid, '_sub_header', true);
+$_feat_quote = get_post_meta($postid, '_feat_quote', true);
+$_feat_quote_author = get_post_meta($postid, '_feat_quote_author', true);
+$_feat_quote_author_title = get_post_meta($postid, '_feat_quote_author_title', true);
+$_project_url = get_post_meta($postid, '_project_url', true);
+$_project_url_text = get_post_meta($postid, '_project_url_text', true);
+
+$is_available = $is_representative = false;
+// get any property tags
+$_tag_terms = wp_get_object_terms( $postid,  'ctax_proptag' );
+if( !is_wp_error($_tag_terms) && count($_tag_terms) > 0 ){
+
+	foreach ( $_tag_terms as $_tag_term) {
+		if( 'available' == $_tag_term-> slug ) {
+			$is_available = true;
+		}
+		if( 'representative' == $_tag_term-> slug ) {
+			$is_representative = true;
+		}
+	}
+
+}
 get_header(); ?>
 
 
@@ -29,15 +54,20 @@ get_header(); ?>
 	<ul>
 		<li><a href="<?php echo esc_url( home_url() );?>">Home</a></li>
 		<?php if( $site_section ) { ?>
-			/ 
-			<li><a href="<?php echo get_permalink( $site_section->ID ) ?>"><?php _e($site_section->post_title); ?></a></li> 
-			/ 
-			<li><a href="<?php echo get_permalink( get_page_by_path( $site_section->post_name . '/' . sanitize_title($post_type->labels->name) ) ); ?>"><?php _e( $post_type->labels->name ); ?></a></li>
+			/ <li><a href="<?php echo get_permalink( $site_section->ID ) ?>"><?php _e($site_section->post_title); ?></a></li>
+			
 			<?php if('' !== $parent_tax_slug ) { ?>
-				/ 
-				<li><a href="<?php echo get_permalink( get_page_by_path( $site_section->post_name . '/' . sanitize_title($post_type->labels->name) . '/' . $parent_tax_slug ) ); ?>"><?php _e($parent_tax_name); ?></a></li>
+				/ <li><a href="<?php echo get_permalink( get_page_by_path( $site_section->post_name . '/' . sanitize_title($parent_tax_slug) ) ); ?>"><?php _e($parent_tax_name); ?></a></li>
+				<?php if( $is_available ) { ?>
+					/ <li><a href="<?php echo get_permalink( get_page_by_path( $site_section->post_name . '/' . sanitize_title($parent_tax_slug) . '/available-properties' ) ); ?>"><?php _e('Available Properties'); ?></a></li>					
+				<?php }; ?>
+				<?php if( $is_representative ) { ?>
+					/ <li><a href="<?php echo get_permalink( get_page_by_path( $site_section->post_name . '/' . sanitize_title($parent_tax_slug) . '/representative-projects' ) ); ?>"><?php _e('Representative Projects'); ?></a></li>					
+				<?php }; ?>				
 			<?php }; ?>
+			
 		<?php }; ?>
+		
 		/ <li><?php the_title();?></li>
 	</ul>
 
@@ -58,150 +88,125 @@ get_header(); ?>
 	<div class="left">
 		[hierarchal nav]
 	</div> <!-- /.left -->
-	
+
 	<div class="right">
+
+		<h1><?php _e($parent_tax_name); ?></h1>
 	
-		<?php 
-		// post meta
-		$_property_location = get_post_meta($postid, '_property_location', true);
-		$_job_phone = get_post_meta($postid, '_job_phone', true);
-		$_job_email = get_post_meta($postid, '_job_email', true);
-		$_vcard_url = get_post_meta($postid, '_vcard_url', true);
-		$_prop_tag = get_post_meta($postid, '_prop_tag', true);
-		$_feat_quote = get_post_meta($postid, '_feat_quote', true);
-		$_feat_quote_author = get_post_meta($postid, '_feat_quote_author', true);
-		$_feat_quote_author_title = get_post_meta($postid, '_feat_quote_author_title', true);
-		?>	
+		<hr />
 
-		<h1><?php echo $post_type->labels->name;?></h1>
-
-		<hr /> 
-		
 		<br />
 		<br />
 
-		<?php
-		if( '' !== $parent_tax_name ) { ?>
-			<h3><?php _e($parent_tax_name); ?></h3>
-		<?php } ?>
+		<div class="clearfix">
+			<?php if( '' !== $_sub_header ) { ?>
+				<h3><?php _e($_sub_header); ?></h3>
+			<?php } ?>
+			<?php if( '' !== $_property_location ) { ?>
+				<div class="location"><?php _e($_property_location); ?></div>
+			<?php } ?>
+		</div>
+
 
 		<?php while ( have_posts() ) : the_post(); ?>
 
-			<div class="contact-hero clearfix">
-			
-				<div class="team-page-left">
-					<?php if( has_post_thumbnail() ) {
-						$image_obj = wp_get_attachment_image_src( get_post_thumbnail_id(), 'full');
+			<div class="hero">
+				<?php
+				$attachments = get_children(
+					array(
+						'post_parent' => $postid,
+						'post_status' => 'inherit',
+						'post_type' => 'attachment',
+						'post_mime_type' => 'image',
+					)
+				);
+
+				if ( !empty( $attachments ) ) {
+
+					$output = '<ul id="property-slides">';
+
+					foreach ( $attachments as $id => $attachment ) {
+						$image_obj = wp_get_attachment_image_src( $id, 'full', false );
 						$img_src = $image_obj[0];
-						$img_width = $image_obj[1];
-						$img_height = $image_obj[2]; ?>
-						<img src="<?php echo $img_src; ?>" width="<?php echo $img_width;?>" height="<?php echo $img_height;?>" class="background-cover" />
-					<?php }; ?>
-				</div> <!-- /.team-page-left -->
+						$iw = $image_obj[1];
+						$ih = $image_obj[2];
 
-				<div class="team-page-right-no-margin">
-					<h3><?php the_title();?></h3>
-					<?php if($_job_title) { ?> <h4><?php echo $_job_title; ?></h4> <?php } ?>
-					<p>
-						<?php if($_job_phone) { echo $_job_phone . '<br />'; } ?>				
-						<?php if($_job_email) { echo antispambot( $_job_email );  } ?>
-					</p>
-					<?php if($_vcard_url) {?>
-						<p><a href="<?php echo esc_url($_vcard_url);?>" class="vcard">Download vCard</a></p>
-					<?php } ?>			
-				</div> <!-- /.team-page-right -->
+						$output .= '<li>';
+							$output .= '<img src="'.$img_src.'" class="background-cover" width="'.$iw.'" height="'.$ih.'" class="background-cover" alt="" />';
+						$output .= '</li>';
+					}
+					$output .= '</ul>';
+					echo $output;
+				}; ?>
+			</div> <!-- /.hero -->
 
-			</div> <!-- /.contact-hero -->		
+			 <blockquote class="property-content">
+				<?php if( '' !== $post->post_excerpt ) { ?>
+					<?php echo wpautop( $post->post_excerpt );?>
+					<p><a class="accordion-toggle btn" href="#">Read More</a></p>
+					<div class="accordion-content">
+						<?php the_content(); ?>
+					</div>
+				<?php } else { ?>
+					<?php the_content(); ?>
+				<?php } ?>
+			</blockquote>
+
+			<?php edit_post_link( __( 'Edit', 'mcshane' ), '<span class="edit-link">', '</span>' );?>
 
 			<div class="clearfix">
 
-				<div class="team-page-left">
-				
-					<blockquote>
-						<?php echo wpautop( get_the_excerpt() );?>
-						<p><a class="accordion-toggle btn" href="#">Read More</a></p>
-						<div class="accordion-content">
-							<?php the_content(); ?>						
-						</div>
-					</blockquote>
-					
-					<?php edit_post_link( __( 'Edit', 'mcshane' ), '<span class="edit-link">', '</span>' );?>
-					
-				</div> <!-- /.team-page-left -->
+				<div class="property-page-left">
 
-				<div class="team-page-right">
+					<?php if ( !empty( $attachments ) ) {  ?>
+
+						<h3>Project Photos</h3>
+						<div class="property-gallery">
+							<?php
+							$output = '<ul class="slider">';
+							foreach ( $attachments as $id => $attachment ) {
+								$image_obj = wp_get_attachment_image_src( $id, 'full', false );
+								$img_src = $image_obj[0];
+								$iw = $image_obj[1];
+								$ih = $image_obj[2];
+
+								$output .= '<li>';
+									$output .= '<img src="'.$img_src.'" class="background-cover" width="'.$iw.'" height="'.$ih.'" class="background-cover" alt="" />';
+								$output .= '</li>';
+							}
+							$output .= '</ul>';
+							echo $output;
+							?>
+						</div>
+					<?php }; ?>
+
+					<?php wp_reset_postdata(); ?>
+
+					<?php if( $_project_url ) : ?>
+						<iframe class="web-box" width="950" height="700" src="<?php echo esc_url($_project_url); ?>"></iframe>
+						<h3>Launch: <a href="#" data-featherlight=".web-box"><?php echo ( $_project_url_text ) ? $_project_url_text : $_project_url; ?></a></h3>
+					<?php endif; ?>
+
+				</div> <!-- /.property-page-left -->
+
+				<div class="property-page-right">
 					<?php if($_feat_quote) { ?>
 					<div class="quote">
 						<p>&#8220;<?php _e($_feat_quote); ?>&#8221;</p>
 						<?php if($_feat_quote_author) { ?>
 							<p><em>&#8212;
 								<?php echo $_feat_quote_author; ?><?php if($_feat_quote_author_title) { echo ',<br />&emsp;' . $_feat_quote_author_title; }; ?>
-							</em></p> 
+							</em></p>
 						<?php }; ?>
 					</div>
 					<?php } ?>
-				</div> <!-- /.team-page-right -->
+				</div>
 
 			</div> <!-- /.clearfix -->
 
-
 		<?php endwhile; ?>
-		
-		<?php if($_prop_tag) { ?>
-		
-			<?php 
-			$prop_tax = 'ctax_proptag';
-			$posttype = 'cpt_property';
-			$prop_qty = 10;
-			$tax_query =  array(
-				array(
-					'taxonomy' => $prop_tax,
-					'field'    => 'slug',
-					'terms'    => $_prop_tag,
-				)
-			);	
-			$r = new WP_Query(
-				array(
-					'post_type'           => $posttype,
-					'posts_per_page'      => $prop_qty,
-					'no_found_rows'       => true,
-					'post_status'         => 'publish',
-					'ignore_sticky_posts' => true,
-					'tax_query'           => $tax_query
-				)
-			);
-		
-			if( $r->have_posts() ) { ?>
-			
-				<h3>Representative Experience</h3>
-				
-				<div class="experience">
-					<ul>
-						<?php while ( $r->have_posts() ) : $r->the_post(); ?>
-							<?php 
-							$img_src = $iw = $ih = '';
-							if( has_post_thumbnail() ){
-								$image_obj = wp_get_attachment_image_src( get_post_thumbnail_id(), 'full');
-								$img_src = $image_obj[0];
-								$iw = $image_obj[1];
-								$ih = $image_obj[2];
-							}; ?>
-							<li>
-								<a href="<?php the_permalink(); ?>">
-									<img src="<?php echo $img_src;?>" class="background-cover" width="<?php echo $iw;?>" height="<?php echo $ih;?>" alt="" />
-									<span class="title"><?php the_title(); ?></span>
-								</a>
-							</li>
-						<?php endwhile; ?>
-					</ul>
-				</div>
 
-			<?php }; ?>
-		
-			<?php wp_reset_postdata(); ?>
-		
-		<?php }; ?>
-		
+
 	</div><!-- /.right -->
 
 </div> <!-- /.content -->
