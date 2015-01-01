@@ -3,16 +3,14 @@
  * The template for displaying 404 pages (Not Found)
  *
  * @package WordPress
- * @subpackage Twenty_Fourteen
- * @since Twenty Fourteen 1.0
+ * @subpackage McShane
+ * @since McShane 1.0
  */
 
 get_header();
 
-global $wp_query;
-
-debug($wp_query);
- ?>
+global $post;
+?>
 
 <div class="breadcrumbs">
 
@@ -34,19 +32,17 @@ debug($wp_query);
 
 <div class="content container clearfix">
 
-	<div class="left">
-		[hierarchal nav]
-		<!-- hierarchal navigation -->
-	</div> <!-- /.left -->
+	<div class="left">&nbsp;</div> <!-- /.left -->
 
 	<div class="right">
 
-		<h1><?php _e('Not Found'); ?></h1>
-		
-			
+		<h2><?php _e('404 Not Found'); ?></h2>
+		<p>We could not find what you're looking for.  Please try again!</p>
+
 	</div> <!-- /.right -->
 
 </div> <!-- /.content -->
+
 
 <?php
 get_footer();

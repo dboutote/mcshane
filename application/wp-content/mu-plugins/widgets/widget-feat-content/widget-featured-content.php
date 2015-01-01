@@ -255,7 +255,7 @@ class Widget_Featured_Content extends WP_Widget {
 								<?php if( has_subheader() ) { ?>
 									<h4><?php display_subheader(); ?></h4>
 								<?php } ?>
-								<p><?php the_excerpt(); ?></p>
+								<?php the_excerpt(); ?>
 								<a href="<?php the_permalink(); ?>" class="btn bottom">More information</a>
 							</div>
 						</li>

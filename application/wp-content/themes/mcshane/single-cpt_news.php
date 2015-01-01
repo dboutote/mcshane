@@ -1,63 +1,55 @@
 <?php
 /**
- * The Template for displaying all single cpt_news post types
+ * The Template for displaying all single cpt_news (News) post types.
  *
  * @package WordPress
  * @subpackage McShane
  * @since McShane 1.0
  */
+ 
 global $post;
-$post_type = get_post_type_object( get_post_type() );
 $postid = get_the_ID();
 $_tax = 'ctax_newstype';
 
 $_terms = wp_get_object_terms( $postid,  $_tax );
 $parent_tax_name = ( !is_wp_error($_terms) && count($_terms) > 0 ) ? $_terms[0]->name : '' ;
 $parent_tax_slug = ( !is_wp_error($_terms) && count($_terms) > 0 ) ? $_terms[0]->slug : '' ;
-$parent_section = false;
+$site_section = false;
 $_site_section = get_post_meta($postid, '_site_section', true);
 if($_site_section){
-	$parent_section = get_post($_site_section);
+	$site_section = get_post($_site_section);
 }
 
 $_full_header = get_post_meta($postid, '_full_header', true);
 get_header(); ?>
 
-
 <div class="breadcrumbs">
 
 	<div class="container clearfix">
-		
-<ul>
-	<li><a href="<?php echo esc_url( home_url() );?>">Home</a></li>
-	<?php if( $parent_section ) { ?>
-		/ 
-		<li><a href="<?php echo get_permalink( $parent_section->ID ) ?>"><?php _e($parent_section->post_title); ?></a></li> 
-		<?php if('' !== $parent_tax_slug ) { ?>
-			/ 
-			<li><a href="<?php echo get_permalink( get_page_by_path( $parent_section->post_name . '/' . $parent_tax_slug ) ) ?>"><?php _e($parent_tax_name); ?></a></li>
-		<?php }; ?>
-	<?php }; ?>
-	/ <li><?php the_title();?></li>
-</ul>
+		<ul>
+			<li><a href="<?php echo esc_url( home_url() );?>">Home</a></li>			
+			<?php if( $site_section ) { ?>			
+				/ <li><a href="<?php echo get_permalink( $site_section->ID ) ?>"><?php _e($site_section->post_title); ?></a></li>
+				<?php if('' !== $parent_tax_slug ) { ?>
+					/ <li><a href="<?php echo get_permalink( get_page_by_path( $site_section->post_name . '/' . sanitize_title($parent_tax_slug) ) ); ?>"><?php _e($parent_tax_name); ?></a></li>
+				<?php }; ?>
+			<?php }; ?>
+			/ <li><?php the_title();?></li>
+		</ul>
 
-		<div class="right"> <a href="javascript:window.print()" class="print"><img src="<?php echo get_stylesheet_directory_uri();?>/images/print.svg"/></a>
-		<form class="search">
-		<input type="text" placeholder="Search"/>
-		<input type="submit" value=""/>
-		</form>
+		<div class="right"> 
+			<a href="javascript:window.print()" class="print"><img src="<?php echo get_stylesheet_directory_uri();?>/images/print.svg" /></a>
+			<?php get_search_form(); ?>
 		</div>
 
 	</div>
 
 </div> <!-- /.breadcrumbs -->
 
-
 <div class="content container clearfix">
 
 	<div class="left">
 		[hierarchal nav]
-		<!-- hierarchal navigation -->
 	</div> <!-- /.left -->
 
 	<div class="right">
@@ -70,9 +62,7 @@ get_header(); ?>
 		<br />
 
 		<div class="clearfix">
-			<?php if( has_fullheader($postid) ) { ?>
-				<h3><?php display_fullheader($postid); ?></h3>
-			<?php } ?>
+			<?php if( has_fullheader($postid) ) { ?> <h3><?php display_fullheader($postid); ?></h3> <?php } ?>
 			<div class="location"><?php echo get_the_date(); ?></div>
 		</div>
 
@@ -90,7 +80,7 @@ get_header(); ?>
 
 			 <blockquote class="property-content">			 
 				<?php if( '' !== $post->post_excerpt ) { ?>
-					<?php echo wpautop( $post->post_excerpt );?>
+					<?php echo wpautop( $post->post_excerpt ); ?>
 					<p><a class="accordion-toggle btn" href="#">Read More</a></p>
 					<div class="accordion-content">
 						<?php the_content(); ?>
@@ -100,14 +90,12 @@ get_header(); ?>
 				<?php } ?>
 			</blockquote>
 			
-			<?php edit_post_link( __( 'Edit', 'mcshane' ), '<span class="edit-link">', '</span>' );?>
-
 		<?php endwhile; ?>
+
+		<?php edit_post_link( __( 'Edit', 'mcshane' ), '<span class="edit-link">', '</span>' ); ?>
 
 	</div><!-- /.right -->
 
 </div> <!-- /.content -->
 
-
-<?php
-get_footer();
+<?php get_footer();

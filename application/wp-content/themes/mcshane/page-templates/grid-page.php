@@ -7,10 +7,9 @@
  * @since McShane 1.0
  */
 
-get_header();
-
 global $post;
-?>
+
+get_header(); ?>
 
 <div class="breadcrumbs">
 
@@ -19,12 +18,10 @@ global $post;
 			<?php breadcrumb_trail(array( 'container' => 'ul', 'show_browse' => false, 'separator'=>'/' )); ?>
 		<?php } ?>
 
-	<div class="right"> <a href="javascript:window.print()" class="print"><img src="<?php echo get_stylesheet_directory_uri();?>/images/print.svg"/></a>
-	<form class="search">
-	<input type="text" placeholder="Search"/>
-	<input type="submit" value=""/>
-	</form>
-	</div>
+		<div class="right"> 
+			<a href="javascript:window.print()" class="print"><img src="<?php echo get_stylesheet_directory_uri();?>/images/print.svg" /></a>
+			<?php get_search_form(); ?>
+		</div>
 
 	</div> <!-- /.container -->
 
@@ -39,15 +36,17 @@ global $post;
 	<div class="right">
 	
 		<?php while ( have_posts() ) : the_post(); ?>
+		
 			<h2><?php the_title();?></h2>
+			
 			<?php the_content();?>
-			<?php edit_post_link( __( 'Edit', 'mcshane' ), '<span class="edit-link">', '</span>' );?>
+			
 		<?php endwhile; ?>
 
-	</div> <!-- /.right -->
+		<?php edit_post_link( __( 'Edit', 'mcshane' ), '<span class="edit-link">', '</span>' ); ?>
+
+	</div><!-- /.right -->
 
 </div> <!-- /.content -->
 
-
-<?php
-get_footer();
+<?php get_footer();

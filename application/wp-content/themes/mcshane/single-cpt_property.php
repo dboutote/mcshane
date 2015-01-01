@@ -1,11 +1,12 @@
 <?php
 /**
- * The Template for displaying all single team member profiles
+ * The Template for displaying all single cpt_property (Property) post types.
  *
  * @package WordPress
  * @subpackage McShane
  * @since McShane 1.0
  */
+
 global $post;
 $post_type = get_post_type_object( get_post_type() );
 $postid = get_the_ID();
@@ -20,17 +21,18 @@ if($_site_section){
 	$site_section = get_post($_site_section);
 }
 
-// post meta
-$_property_location = get_post_meta($postid, '_property_location', true);
-$_sub_header = get_post_meta($postid, '_sub_header', true);
-$_feat_quote = get_post_meta($postid, '_feat_quote', true);
-$_feat_quote_author = get_post_meta($postid, '_feat_quote_author', true);
+// property meta
+$_property_location       = get_post_meta($postid, '_property_location', true);
+$_sub_header              = get_post_meta($postid, '_sub_header', true);
+$_feat_quote              = get_post_meta($postid, '_feat_quote', true);
+$_feat_quote_author       = get_post_meta($postid, '_feat_quote_author', true);
 $_feat_quote_author_title = get_post_meta($postid, '_feat_quote_author_title', true);
-$_project_url = get_post_meta($postid, '_project_url', true);
-$_project_url_text = get_post_meta($postid, '_project_url_text', true);
+$_project_url             = get_post_meta($postid, '_project_url', true);
+$_project_url_text        = get_post_meta($postid, '_project_url_text', true);
+$_gallery_title           = get_post_meta($postid, '_gallery_title', true);
 
+// property tags
 $is_available = $is_representative = false;
-// get any property tags
 $_tag_terms = wp_get_object_terms( $postid,  'ctax_proptag' );
 if( !is_wp_error($_tag_terms) && count($_tag_terms) > 0 ){
 
@@ -46,42 +48,35 @@ if( !is_wp_error($_tag_terms) && count($_tag_terms) > 0 ){
 }
 get_header(); ?>
 
-
 <div class="breadcrumbs">
 
-<div class="container clearfix">
+	<div class="container clearfix">
 
-	<ul>
-		<li><a href="<?php echo esc_url( home_url() );?>">Home</a></li>
-		<?php if( $site_section ) { ?>
-			/ <li><a href="<?php echo get_permalink( $site_section->ID ) ?>"><?php _e($site_section->post_title); ?></a></li>
-			
-			<?php if('' !== $parent_tax_slug ) { ?>
-				/ <li><a href="<?php echo get_permalink( get_page_by_path( $site_section->post_name . '/' . sanitize_title($parent_tax_slug) ) ); ?>"><?php _e($parent_tax_name); ?></a></li>
-				<?php if( $is_available ) { ?>
-					/ <li><a href="<?php echo get_permalink( get_page_by_path( $site_section->post_name . '/' . sanitize_title($parent_tax_slug) . '/available-properties' ) ); ?>"><?php _e('Available Properties'); ?></a></li>					
+		<ul>
+			<li><a href="<?php echo esc_url( home_url() );?>">Home</a></li>
+			<?php if( $site_section ) { ?>
+				/ <li><a href="<?php echo get_permalink( $site_section->ID ) ?>"><?php _e($site_section->post_title); ?></a></li>
+				<?php if('' !== $parent_tax_slug ) { ?>
+					/ <li><a href="<?php echo get_permalink( get_page_by_path( $site_section->post_name . '/' . sanitize_title($parent_tax_slug) ) ); ?>"><?php _e($parent_tax_name); ?></a></li>
+					<?php if( $is_available ) { ?>
+						/ <li><a href="<?php echo get_permalink( get_page_by_path( $site_section->post_name . '/' . sanitize_title($parent_tax_slug) . '/available-properties' ) ); ?>"><?php _e('Available Properties'); ?></a></li>
+					<?php }; ?>
+					<?php if( $is_representative ) { ?>
+						/ <li><a href="<?php echo get_permalink( get_page_by_path( $site_section->post_name . '/' . sanitize_title($parent_tax_slug) . '/representative-projects' ) ); ?>"><?php _e('Representative Projects'); ?></a></li>
+					<?php }; ?>
 				<?php }; ?>
-				<?php if( $is_representative ) { ?>
-					/ <li><a href="<?php echo get_permalink( get_page_by_path( $site_section->post_name . '/' . sanitize_title($parent_tax_slug) . '/representative-projects' ) ); ?>"><?php _e('Representative Projects'); ?></a></li>					
-				<?php }; ?>				
 			<?php }; ?>
-			
-		<?php }; ?>
-		
-		/ <li><?php the_title();?></li>
-	</ul>
+			/ <li><?php the_title();?></li>
+		</ul>
 
-<div class="right"> <a href="javascript:window.print()" class="print"><img src="<?php echo get_stylesheet_directory_uri();?>/images/print.svg"/></a>
-<form class="search">
-<input type="text" placeholder="Search"/>
-<input type="submit" value=""/>
-</form>
-</div>
+		<div class="right"> 
+			<a href="javascript:window.print()" class="print"><img src="<?php echo get_stylesheet_directory_uri();?>/images/print.svg" /></a>
+			<?php get_search_form(); ?>
+		</div>
 
-</div>
+	</div>
 
 </div> <!-- /.breadcrumbs -->
-
 
 <div class="content container clearfix">
 
@@ -92,21 +87,18 @@ get_header(); ?>
 	<div class="right">
 
 		<h1><?php _e($parent_tax_name); ?></h1>
-	
+
 		<hr />
 
 		<br />
 		<br />
 
 		<div class="clearfix">
-			<?php if( '' !== $_sub_header ) { ?>
-				<h3><?php _e($_sub_header); ?></h3>
-			<?php } ?>
+			<?php if( has_subheader( $postid ) ) { ?> <h3><?php display_subheader( $postid );?></h3> <?php } ?>
 			<?php if( '' !== $_property_location ) { ?>
 				<div class="location"><?php _e($_property_location); ?></div>
 			<?php } ?>
 		</div>
-
 
 		<?php while ( have_posts() ) : the_post(); ?>
 
@@ -138,6 +130,7 @@ get_header(); ?>
 					$output .= '</ul>';
 					echo $output;
 				}; ?>
+				<?php if( $_gallery_title ) { ?> <div class="title"><?php _e($_gallery_title); ?></div> <?php }; ?>
 			</div> <!-- /.hero -->
 
 			 <blockquote class="property-content">
@@ -151,8 +144,6 @@ get_header(); ?>
 					<?php the_content(); ?>
 				<?php } ?>
 			</blockquote>
-
-			<?php edit_post_link( __( 'Edit', 'mcshane' ), '<span class="edit-link">', '</span>' );?>
 
 			<div class="clearfix">
 
@@ -206,11 +197,10 @@ get_header(); ?>
 
 		<?php endwhile; ?>
 
+		<?php edit_post_link( __( 'Edit', 'mcshane' ), '<span class="edit-link">', '</span>' ); ?>
 
 	</div><!-- /.right -->
 
 </div> <!-- /.content -->
 
-
-<?php
-get_footer();
+<?php get_footer();

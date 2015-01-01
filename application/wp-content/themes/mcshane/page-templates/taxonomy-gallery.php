@@ -1,17 +1,17 @@
 <?php
 /**
  * Template Name: Taxonomy Gallery Page
+ * 
+ * Builds page of content categorized with the selected taxonomy term.
  *
  * @package WordPress
  * @subpackage McShane
  * @since McShane 1.0
  */
 
-get_header();
-
 global $post;
-?>
 
+get_header(); ?>
 
 <div class="breadcrumbs">
 
@@ -20,12 +20,10 @@ global $post;
 			<?php breadcrumb_trail(array( 'container' => 'ul', 'show_browse' => false, 'separator'=>'/' )); ?>
 		<?php } ?>
 
-	<div class="right"> <a href="javascript:window.print()" class="print"><img src="<?php echo get_stylesheet_directory_uri();?>/images/print.svg"/></a>
-	<form class="search">
-	<input type="text" placeholder="Search"/>
-	<input type="submit" value=""/>
-	</form>
-	</div>
+		<div class="right"> 
+			<a href="javascript:window.print()" class="print"><img src="<?php echo get_stylesheet_directory_uri();?>/images/print.svg" /></a>
+			<?php get_search_form(); ?>
+		</div>
 
 	</div> <!-- /.container -->
 
@@ -35,17 +33,22 @@ global $post;
 
 	<div class="left">
 		[hierarchal nav]
-		<!-- hierarchal navigation -->
 	</div> <!-- /.left -->
 
 	<div class="right">
 
+		<?php if( $post && $post->post_parent > 0 ) { ?>
+
+			<h1><?php echo get_post( $post->post_parent )->post_title;?></h1>
+	
+			<hr />	
+
+		<?php } ?>
+			
 		<?php while ( have_posts() ) : the_post(); ?>
-			<?php if( $post->post_parent > 0 ) { ?>
-				<h1><?php echo get_post( $post->post_parent )->post_title;?></h1>
-			<?php } ?>
-			<hr />
-			<?php the_content();?>			
+			
+			<?php the_content();?>	
+			
 		<?php endwhile; ?>
 
 		<?php
@@ -78,13 +81,14 @@ global $post;
 				'order'               => 'asc',
 				'tax_query'           => $tax_query,
 			)
-		)?>
+		); ?>
 
 		<?php if ($r->have_posts()) : ?>
 
 			<h3><?php echo $_term->name;?></h3>
 
 			<div class="gallery clearfix">
+			
 				<ul>
 
 					<?php while ( $r->have_posts() ) : $r->the_post(); ?>
@@ -94,7 +98,7 @@ global $post;
 								<?php
 								$img_src = $iw = $ih = '';
 								if( has_post_thumbnail() ){
-								$image_obj = wp_get_attachment_image_src( get_post_thumbnail_id(), 'full');
+								$image_obj = wp_get_attachment_image_src( get_post_thumbnail_id(), 'mcsh-gallery-thumb');
 								$img_src = $image_obj[0];
 								$iw = $image_obj[1];
 								$ih = $image_obj[2];
@@ -102,8 +106,7 @@ global $post;
 								<img src="<?php echo $img_src;?>" class="background-cover" width="<?php echo $iw;?>" height="<?php echo $ih;?>" />
 								<span class="title">
 									<strong><?php the_title();?></strong>
-									<br />
-									<?php if( has_subheader() ) { display_subheader(); } ?>
+									<?php if( has_subheader() ) {?> <br /> <?php display_subheader(); } ?>
 								</span>
 							</a>
 						</li>
@@ -111,17 +114,17 @@ global $post;
 					<?php endwhile; ?>
 
 				</ul>
+				
 			</div> <!-- /.gallery -->
 
 		<?php endif; ?>
 
 		<?php wp_reset_postdata(); ?>
 		
-		<?php edit_post_link( __( 'Edit', 'mcshane' ), '<span class="edit-link">', '</span>' );?>
+		<?php edit_post_link( __( 'Edit', 'mcshane' ), '<span class="edit-link">', '</span>' ); ?>
 
-	</div> <!-- /.right -->
+	</div><!-- /.right -->
 
 </div> <!-- /.content -->
 
-<?php
-get_footer();
+<?php get_footer();

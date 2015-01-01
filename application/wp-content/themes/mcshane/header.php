@@ -36,13 +36,16 @@
 	<div class="container clearfix">
 	
 		<nav>
+		
 			<div class="logo">
 				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><img src="<?php echo get_stylesheet_directory_uri();?>/images/logo.svg"/></a>
 			</div>
+			
 			<ul id="social">
 				<li><a href="#"><img src="<?php echo get_stylesheet_directory_uri();?>/images/twitter.svg"/></a></li>
 				<li><a href="#"><img src="<?php echo get_stylesheet_directory_uri();?>/images/newsletter.svg"/></a></li>
 			</ul>
+			
 			<ul id="main">
 				<?php 
 				$menu_args = array(
@@ -53,7 +56,9 @@
 				); ?>
 				<?php wp_nav_menu($menu_args); ?>
 			</ul>
+			
 		</nav>
+		
 	</div><!-- /.container -->
 	
 </header>

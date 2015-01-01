@@ -1,14 +1,10 @@
 <?php
 /**
- * The template for displaying all pages
- *
- * This is the template that displays all pages by default.
- * Please note that this is the WordPress construct of pages and that
- * other 'pages' on your WordPress site will use a different template.
+ * The template for displaying the Front Page of the site
  *
  * @package WordPress
- * @subpackage RealInsight
- * @since RealInsight 1.0
+ * @subpackage McShane
+ * @since McShane 1.0
  */
 
 get_header(); ?>
@@ -20,7 +16,9 @@ get_header(); ?>
 	<?php endwhile; ?>
 	
 	<div class="container">
+	
 		<div class="quick-links">Learn more about:
+		
 			<?php  
 			$secondary_menu_args = array(					
 				'container'=> false,
@@ -31,7 +29,9 @@ get_header(); ?>
 			<ul>				
 				<?php wp_nav_menu($secondary_menu_args); ?>
 			</ul>
+			
 		</div>
+		
 	</div> <!-- /.container -->
 	
 </div> <!-- /#home-hero -->

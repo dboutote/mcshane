@@ -10,52 +10,52 @@
  * @link http://codex.wordpress.org/Template_Hierarchy
  *
  * @package WordPress
- * @subpackage Twenty_Fourteen
- * @since Twenty Fourteen 1.0
+ * @subpackage McShane
+ * @since McShane 1.0
  */
+
+global $post;
 
 get_header(); ?>
 
-<div id="main-content" class="main-content">
+<div class="breadcrumbs">
 
-<?php
-	if ( is_front_page() && twentyfourteen_has_featured_posts() ) {
-		// Include the featured content template.
-		get_template_part( 'featured-content' );
-	}
-?>
+	<div class="container clearfix">
 
-	<div id="primary" class="content-area">
-		<div id="content" class="site-content" role="main">
+		<?php if ( function_exists( 'breadcrumb_trail' ) ) { ?>
+			<?php breadcrumb_trail(array( 'container' => 'ul', 'show_browse' => false, 'separator'=>'/' )); ?>
+		<?php } ?>
 
-		<?php
-			if ( have_posts() ) :
-				// Start the Loop.
-				while ( have_posts() ) : the_post();
+		<div class="right">
+			<a href="javascript:window.print()" class="print"><img src="<?php echo get_stylesheet_directory_uri();?>/images/print.svg" /></a>
+			<?php get_search_form(); ?>
+		</div>
 
-					/*
-					 * Include the post format-specific template for the content. If you want to
-					 * use this in a child theme, then include a file called called content-___.php
-					 * (where ___ is the post format) and that will be used instead.
-					 */
-					get_template_part( 'content', get_post_format() );
+	</div> <!-- /.container -->
 
-				endwhile;
-				// Previous/next post navigation.
-				//twentyfourteen_paging_nav();
+</div> <!-- /.breadcrumbs -->
 
-			else :
-				// If no content, include the "No posts found" template.
-				get_template_part( 'content', 'none' );
+<div class="content container clearfix">
 
-			endif;
-		?>
+	<div class="left">
+		[hierarchal nav]
+	</div> <!-- /.left -->
 
-		</div><!-- #content -->
-	</div><!-- #primary -->
-	<?php get_sidebar( 'content' ); ?>
-</div><!-- #main-content -->
+	<div class="right">
 
-<?php
-get_sidebar();
-get_footer();
+		<?php if( $post->post_parent > 0 ) { ?>
+			<h1><?php echo get_post( $post->post_parent )->post_title;?></h1>
+		<?php } ?>
+
+		<?php while ( have_posts() ) : the_post(); ?>
+			<h2><?php the_title();?></h2>
+			<?php the_content();?>
+			<?php edit_post_link( __( 'Edit', 'mcshane' ), '<span class="edit-link">', '</span>' );?>
+		<?php endwhile; ?>
+
+	</div> <!-- /.right -->
+
+</div> <!-- /.content -->
+
+
+<?php get_footer();

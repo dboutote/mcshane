@@ -39,28 +39,28 @@ class CPT_Properties
 		#add_filter( 'include_featquote_dont_show_list', array($this, 'check_post_type'), 0,2 );
 		add_filter( 'mb_subheader_metabox_title', array($this, 'subheader_metabox_title'), 0,1 );
 		add_filter( 'mb_subheader_metabox_description', array($this, 'subheader_metabox_description'), 0,1 );
-		add_action( 'after_gallery_item_title', array($this, 'display_gallery_item_subheader'), 9, 1 );		
+		add_action( 'after_gallery_item_title', array($this, 'display_gallery_item_subheader'), 9, 1 );
 	}
-	
+
 	/**
 	 * Display a gallery item Sub Header
-	 * 
+	 *
 	 * @access  public
 	 * @since   1.0
 	 */
 	public function display_gallery_item_subheader( $_gallery_item )
-	{			
+	{
 		global $CPT_Galleries;
-		remove_action( 'after_gallery_item_title', array( $CPT_Galleries, 'display_gallery_item_subheader' ), 10,1 );	
+		remove_action( 'after_gallery_item_title', array( $CPT_Galleries, 'display_gallery_item_subheader' ), 10,1 );
 		$_property_location = get_post_meta($_gallery_item['ID'], '_property_location', true);
-		
+
 		if( $_property_location ){
 			echo '<br />' . $_property_location;
 		};
-		
+
 		return $_gallery_item;
-	}	
-	
+	}
+
 	/**
 	 * Filter the text that appears for the Sub Header metabox
 	 *
@@ -69,17 +69,17 @@ class CPT_Properties
 	 *
 	 * @param text $description The description text of the meta box
 	 * @return text $description The filtered description text of the meta box
-	 */	
+	 */
 	public function subheader_metabox_description( $description )
 	{
 		if( self::POST_TYPE == get_post_type() ) {
-			$description = 'Enter optional specs on this property.';		
+			$description = 'Enter optional specs on this property.';
 		}
 
 		return $description;
 	}
-	
-	
+
+
 	/**
 	 * Filter the text that appears for the Sub Header metabox
 	 *
@@ -88,11 +88,11 @@ class CPT_Properties
 	 *
 	 * @param text $title The title text of the meta box
 	 * @return text $title The filtered title text of the meta box
-	 */	
+	 */
 	public function subheader_metabox_title( $title )
 	{
 		if( self::POST_TYPE == get_post_type() ) {
-			$title = 'Custom Specs Sub Header';		
+			$title = 'Custom Specs Sub Header';
 		}
 
 		return $title;
@@ -225,8 +225,15 @@ class CPT_Properties
 				'type' => 'text',
 				'default' => '',
 				'title' => __('Property Location'),
-				'description' => __( 'City, ST', 'mcshane' ),
+				'description' => __( 'City, State', 'mcshane' ),
 			),
+			'gallery_title' => array(
+				'name' => 'gallery_title',
+				'type' => 'text',
+				'default' => '',
+				'title' => __('Gallery Title'),
+				'description' => __( 'This will appear over the property image gallery.', 'mcshane' ),
+			),			
 			'project_url' => array(
 				'name' => 'project_url',
 				'type' => 'text',
@@ -239,27 +246,6 @@ class CPT_Properties
 				'type' => 'text',
 				'default' => '',
 				'title' => __('Project URL Text'),
-				'description' => __( '', 'mcshane' ),
-			),
-			'address_zip' => array(
-				'name' => 'address_zip',
-				'type' => 'text',
-				'default' => '',
-				'title' => __('Zip Code'),
-				'description' => __( '', 'mcshane' ),
-			),
-			'latitude' => array(
-				'name' => 'latitude',
-				'type' => 'text',
-				'default' => '',
-				'title' => __('Property Latitude'),
-				'description' => __( '', 'mcshane' ),
-			),
-			'longitude' => array(
-				'name' => 'longitude',
-				'type' => 'text',
-				'default' => '',
-				'title' => __('Property Longitude'),
 				'description' => __( '', 'mcshane' ),
 			),
 		);
@@ -318,7 +304,12 @@ class CPT_Properties
 				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
 				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
 			}
-			
+
+			if ( 'gallery_title' === $meta_field['name']) {
+				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
+				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
+			}
+
 			if ( 'project_url' === $meta_field['name']) {
 				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
 				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
@@ -327,19 +318,9 @@ class CPT_Properties
 			if ( 'project_url_text' === $meta_field['name']) {
 				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
 				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
-			}			
-			/*
-			if ( 'latitude' === $meta_field['name']) {
-				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
-				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
 			}
-
-			if ( 'longitude' === $meta_field['name']) {
-				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
-				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
-			}
-			*/
-
+			
+			
 		}
 
 		echo $output;
@@ -471,8 +452,8 @@ class CPT_Properties
 				'query_var'                     => true                                         	// False to prevent queries, or string to customize query var. Default will use $taxonomy as query var
 			)
 		);
-	} 
-	
+	}
+
 	/**
 	 * Register Taxonomy
 	 *
@@ -524,8 +505,8 @@ class CPT_Properties
 				'query_var'                     => true                                         	// False to prevent queries, or string to customize query var. Default will use $taxonomy as query var
 			)
 		);
-	} 	
-	 
+	}
+
 }
 
 
@@ -533,13 +514,13 @@ function mcsh_get_property_photos( $post_id = null ) {
 	$post_id = ( null === $post_id ) ? get_the_ID() : $post_id;
 	$attachments = get_children(
 		array(
-			'post_parent' => $id, 
-			'post_status' => 'inherit', 
-			'post_type' => 'attachment', 
+			'post_parent' => $id,
+			'post_status' => 'inherit',
+			'post_type' => 'attachment',
 			'post_mime_type' => 'image',
-		) 
+		)
 	);
-	
+
 	return $attachments;
 
 }

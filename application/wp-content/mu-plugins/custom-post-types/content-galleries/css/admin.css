@@ -1,14 +1,31 @@
-#gallery-frame:after{
+#gallery-frame:after,
+#gallery-titles:after,
+#gallery-shortcode:after {
     clear: both;
     content: ".";
     display: block;
     height: 0;
     visibility: hidden;
 }
+
 #gallery-frame {
 	display: block;
     margin-left: 300px;
     margin-top: 23px;
+}
+
+#gallery-titles,
+#gallery-shortcode {
+    border-top: 1px solid #ddd;
+    margin-top: 23px;
+    padding-top: 10px;
+}
+
+#gallery-titles p,
+#gallery-shortcode p,
+#gallery-titles h4,
+#gallery-shortcode h4  {
+	margin: 0 0 10px;
 }
 
 #gallery-settings-column {

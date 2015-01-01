@@ -38,6 +38,7 @@ class CPT_Galleries
 		add_action( 'save_post_'.self::POST_TYPE, array($this,'save_meta'), 0, 3 );
 		add_filter( 'include_subheader_dont_show_list', array($this, 'check_post_type'), 0,2);
 		add_filter( 'include_featquote_dont_show_list', array($this, 'check_post_type'), 0,2);
+		add_filter( 'include_sitesection_dont_show_list', array($this, 'check_post_type'), 0,2);
 		#add_filter( 'manage_'.self::POST_TYPE.'_posts_columns', array($this, 'add_new_columns') );
 		#add_action( 'manage_'.self::POST_TYPE.'_posts_custom_column', array($this,'add_column_data'), 10, 2 );
 		add_action( 'wp_ajax_setup_gallery_paged_posts', array($this, 'get_paged_posts') );
@@ -116,6 +117,7 @@ class CPT_Galleries
 		if( !is_null($post_object) ){
 
 			$_gallery_items = get_post_meta($id, '_gallery_items', true);
+			$_show_titles = get_post_meta($id, '_show_titles', true);
 
 			$gallery_title = $post_object->post_title;
 			$gallery_title_class = sanitize_title($gallery_title);
@@ -140,16 +142,19 @@ class CPT_Galleries
 									<?php
 									$img_src = $iw = $ih = '';
 									if( has_post_thumbnail($id) ){
-										$image_obj = wp_get_attachment_image_src( get_post_thumbnail_id($id), 'full');
+										$thumb_size = ( $is_featured ) ? 'full' : 'mcsh-gallery-thumb';
+										$image_obj = wp_get_attachment_image_src( get_post_thumbnail_id($id), $thumb_size);
 										$img_src = $image_obj[0];
 										$iw = $image_obj[1];
 										$ih = $image_obj[2];
 									}; ?>
 									<img src="<?php echo $img_src;?>" class="background-cover" width="<?php echo $iw;?>" height="<?php echo $ih;?>" />
+									<?php if( $_show_titles ) { ?>
 									<span class="title">
 										<strong><?php echo $the_title; ?></strong>										
 										<?php do_action('after_gallery_item_title', $_gallery_item); ?>
 									</span>
+									<?php }; ?>
 								</a>
 							</li>
 						<?php }?>
@@ -539,6 +544,13 @@ class CPT_Galleries
 				'title' => '',
 				'description' => '',
 			),
+			'show_titles' => array(
+				'name' => 'show_titles',
+				'type' => 'checkbox',
+				'default' => '',
+				'title' => __('Check here to show the content titles.'),
+				'description' => __('')				
+			),				
 		);
 
 		$args = array(
@@ -730,11 +742,6 @@ class CPT_Galleries
 
 						</div>
 
-						<?php if( $postID > 0 && $postParent < 1 ){ ?>
-							<p class="shortcode">Copy/paste this shortcode wherever you want your gallery to appear.<br />
-							<input class="shortcodecode widefat" type="text" value="[content_gallery id=<?php echo $postID;?>]" readonly="readonly" /></p>
-						<?php }; ?>
-
 					</div>  <!-- /#gallery-management-column -->
 
 				</div>  <!-- /#gallery-frame -->
@@ -743,11 +750,30 @@ class CPT_Galleries
 
 				$output .= ob_get_clean();
 			}
+			
+			if ( 'show_titles' === $meta_field['name']) {			
+				$checked = ('show_titles_y' === $meta_field_value) ? ' checked="checked"' : ' ' ;
+				$output .= '<div id="gallery-titles">';
+				$output .= '<h4>Additional Settings</h4>';
+				$output .= '<p><label for="'.$meta_field['name'].'">';
+				$output .= '<input class="checkbox" type="checkbox" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="show_titles_y"' . $checked . '/> <span class="desc">'.$meta_field['title'].'</span></label></p>';			
+				$output .= '</div>';
+			}
+			
 
 		}
+		
+		ob_start(); 
 
-
-
+		if( $postID > 0 && $postParent < 1 ){ ?>
+			<div id="gallery-shortcode">
+			<p class="shortcode">Copy/paste this shortcode wherever you want your gallery to appear.<br />
+			<input class="shortcodecode widefat" type="text" value="[content_gallery id=<?php echo $postID;?>]" readonly="readonly" /></p>
+			</div>
+		<?php };
+			
+		$output .= ob_get_clean();
+			
 		echo $output;
 
 		return;

@@ -7,56 +7,52 @@
  * other 'pages' on your WordPress site will use a different template.
  *
  * @package WordPress
- * @subpackage Navy_Pier
- * @since Navy Pier 1.0
+ * @subpackage McShane
+ * @since McShane 1.0
  */
+
+global $post;
 
 get_header(); ?>
 
-<?php global $post; ?>
+<div class="breadcrumbs">
 
-<div id="inside-hero-region">
-<?php
-if( has_post_thumbnail() ){
-	$image_obj = wp_get_attachment_image_src( get_post_thumbnail_id(), 'full');
-	$img_src = $image_obj[0];
-	$img_width = $image_obj[1];
-	$img_height = $image_obj[2];
-	?>
-	<img src="<?php echo $img_src; ?>" width="<?php echo $img_width;?>" height="<?php echo $img_height;?>" class="background-cover" /><img src="<?php echo get_stylesheet_directory_uri(); ?>/images/inside-hero-shadow.png" class="hero-shadow"> 
-<?php }; ?>
+	<div class="container clearfix">
 
-</div>  <!-- /#inside-hero-region -->
+		<?php if ( function_exists( 'breadcrumb_trail' ) ) { ?>
+			<?php breadcrumb_trail(array( 'container' => 'ul', 'show_browse' => false, 'separator'=>'/' )); ?>
+		<?php } ?>
 
-<div class="container">  <!-- <?php echo basename(__FILE__); ?> -->
-
-	<div class="intro clearfix">
-		
-		<div class="padded">
-			<?php
-				// Start the Loop.
-				while ( have_posts() ) : the_post();
-					the_title( '<h1 class="entry-title">', '</h1>' );
-					the_content();
-				endwhile;
-			?>
+		<div class="right">
+			<a href="javascript:window.print()" class="print"><img src="<?php echo get_stylesheet_directory_uri();?>/images/print.svg" /></a>
+			<?php get_search_form(); ?>
 		</div>
-		
-		<?php /*<div class="col padded">
-			<div class="page-actions align-right">
-				<a href="#" data-shareid="<?php echo $post->ID;?>" class="icon share">share page</a><a href="#" class="icon print">print page</a>
-			</div>
-		
-			<?php  if( mbp_has_promotion() ){ ?>
-				<?php mbp_display_promotion_box(); ?>
-			<?php }?>
-		</div> */ ?>
-		
-	</div> <!-- /.intro -->
+
+	</div> <!-- /.container -->
+
+</div> <!-- /.breadcrumbs -->
+
+<div class="content container clearfix">
+
+	<div class="left">
+		[hierarchal nav]
+	</div> <!-- /.left -->
+
+	<div class="right">
+
+		<?php if( $post->post_parent > 0 ) { ?>
+			<h1><?php echo get_post( $post->post_parent )->post_title;?></h1>
+		<?php } ?>
+
+		<?php while ( have_posts() ) : the_post(); ?>
+			<h2><?php the_title();?></h2>
+			<?php the_content();?>
+			<?php edit_post_link( __( 'Edit', 'mcshane' ), '<span class="edit-link">', '</span>' );?>
+		<?php endwhile; ?>
+
+	</div> <!-- /.right -->
+
+</div> <!-- /.content -->
 
 
-</div> <!-- /.container -->
-
-<?php get_sidebar('ads'); 
-
-get_footer();
+<?php get_footer();

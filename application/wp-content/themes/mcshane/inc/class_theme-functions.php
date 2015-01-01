@@ -38,15 +38,42 @@ class Theme_Functions
 		add_filter( 'wp_title', array($this, 'wp_title'), 10,2 );
 
 		#add_action( 'wp_head', array($this, 'add_social_meta') );
-		
+
 		add_filter( 'nav_menu_css_class', array($this, 'nav_active_class'), 10 , 2);
 		add_filter( 'post_gallery', array($this, 'post_gallery'), 0 , 2);
+		add_filter( 'widget_text', array($this, 'filter_widget_text'), 0 , 2);
 	}
 	
+	
+	/**
+	 * String Replace text in widgets
+	 *
+	 * filter the url for images
+	 * 
+	 * @access public
+	 * @since McShane 1.0
+	 */
+	public function filter_widget_text($text)
+	{
+		$search = array(
+			'<!-- theme_img_url -->'
+		);
+		
+		$replace = array(
+			get_stylesheet_directory_uri() . '/images'
+		);
+		
+		$text = str_replace($search, $replace, $text);
+		
+		return $text;
+	}	
+
 
 	/**
 	 * Override Gallery shortcode
-	 
+	 * 
+	 * @access public
+	 * @since McShane 1.0
 	 */
 	public function post_gallery( $output, $attr )
 	{
@@ -54,7 +81,7 @@ class Theme_Functions
 		if( ! isset($attr['tpl']) || empty($attr['tpl']) ){
 			return $output;
 		}
-		
+
 		$post = get_post();
 
 		if ( ! empty( $attr['ids'] ) ) {
@@ -64,7 +91,7 @@ class Theme_Functions
 			}
 			$attr['include'] = $attr['ids'];
 		}
-		
+
 		// We're trusting author input, so let's at least make sure it looks like a valid orderby statement
 		if ( isset( $attr['orderby'] ) ) {
 			$attr['orderby'] = sanitize_sql_orderby( $attr['orderby'] );
@@ -72,9 +99,9 @@ class Theme_Functions
 				unset( $attr['orderby'] );
 			}
 		}
-		
+
 		$html5 = current_theme_supports( 'html5', 'gallery' );
-		
+
 		$atts = shortcode_atts( array(
 			'order'      => 'ASC',
 			'orderby'    => 'menu_order ID',
@@ -88,13 +115,13 @@ class Theme_Functions
 			'exclude'    => '',
 			'link'       => ''
 		), $attr, 'gallery' );
-		
+
 		$id = intval( $atts['id'] );
-		
+
 		if ( 'RAND' == $atts['order'] ) {
 			$atts['orderby'] = 'none';
 		}
-		
+
 		if ( ! empty( $atts['include'] ) ) {
 			$_attachments = get_posts( array( 'include' => $atts['include'], 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $atts['order'], 'orderby' => $atts['orderby'] ) );
 
@@ -107,11 +134,11 @@ class Theme_Functions
 		} else {
 			$attachments = get_children( array( 'post_parent' => $id, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'order' => $atts['order'], 'orderby' => $atts['orderby'] ) );
 		}
-		
+
 		if ( empty( $attachments ) ) {
 			return '';
 		}
-		
+
 		if ( is_feed() ) {
 			$output = "\n";
 			foreach ( $attachments as $att_id => $attachment ) {
@@ -119,20 +146,20 @@ class Theme_Functions
 			}
 			return $output;
 		}
-		
-		
-		// are we building the front page hero gallery?	
+
+
+		// are we building the front page hero gallery?
 		if( 'home-hero' == $attr['tpl'] ) {
-			
+
 			$output = '<ul class="hero-slider">';
-				
+
 				foreach ( $attachments as $id => $attachment ) {
 					$image_obj = wp_get_attachment_image_src( $id, $atts['size'], false );
 					$img_src = $image_obj[0];
 					$iw = $image_obj[1];
-					$ih = $image_obj[2];				
+					$ih = $image_obj[2];
 					$image_meta  = wp_get_attachment_metadata( $id );
-					
+
 					$output .= '<li>';
 						$output .= '<img src="'.$img_src.'" class="background-cover" width="'.$iw.'" height="'.$ih.'" alt="" /> <img src="' . get_template_directory_uri() . '/images/hero-shadow.png" class="hero-shadow" alt="" />';
 						$output .= '<div class="container">';
@@ -140,44 +167,45 @@ class Theme_Functions
 						$output .= '</div>';
 					$output .= '</li>';
 				}
-				
-			$output .= '</ul>';		
-			
+
+			$output .= '</ul>';
+
 		}
-		
-		
-		// are we building grid gallery?	
+
+
+		// are we building grid gallery?
 		if( 'grid' == $attr['tpl'] ) {
-			
+
 			$output = ' <div class="gallery clearfix"><ul>';
-				
+
 				foreach ( $attachments as $id => $attachment ) {
-					$image_obj = wp_get_attachment_image_src( $id, $atts['size'], false );
+					$image_obj = wp_get_attachment_image_src( $id, 'mcsh-gallery-thumb', false );
 					$img_src = $image_obj[0];
 					$iw = $image_obj[1];
-					$ih = $image_obj[2];								
+					$ih = $image_obj[2];
 					$output .= '<li>';
-						$output .= '<a href="#"><img src="'.$img_src.'" class="background-cover" width="'.$iw.'" height="'.$ih.'" alt="" /></a>';		
+						$output .= '<a href="#"><img src="'.$img_src.'" class="background-cover" width="'.$iw.'" height="'.$ih.'" alt="" /></a>';
 					$output .= '</li>';
 				}
-				
-			$output .= '</ul></div>';		
-			
-		}	
+
+			$output .= '</ul></div>';
+
+		}
 
 		return $output;
 
 	}
-	
-	
+
+
 	/**
 	 * Register Widget areas
-	 * 
+	 *
+	 * @access public
 	 * @since McShane 1.0
 	 */
-	public function widgets_init() 
-	{	
-	
+	public function widgets_init()
+	{
+
 		register_sidebar( array(
 			'name'          => __( 'Front Page Primary Sidebar', 'mcshane' ),
 			'id'            => 'sidebar-1',
@@ -187,23 +215,54 @@ class Theme_Functions
 			'before_title'  => '<h1 class="widget-title">',
 			'after_title'   => '</h1>',
 		) );
-	
+
 		register_sidebar( array(
-			'name'          => __( 'Front Page Secondary Sidebar', 'mcshane' ),
-			'id'            => 'sidebar-2',
-			'description'   => __( 'The second aside area below the homepage rotator', 'mcshane' ),
+			'name'          => __( 'Footer Sidebar: Left', 'mcshane' ),
+			'id'            => 'sidebar-footer-left',
+			'description'   => __( 'The left footer aside area.', 'mcshane' ),
 			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
 			'after_widget'  => '</aside>',
-			'before_title'  => '<h1 class="widget-title">',
-			'after_title'   => '</h1>',
+			'before_title'  => '<h4 class="widget-title">',
+			'after_title'   => '</h4>',
 		) );
-	
+
+		register_sidebar( array(
+			'name'          => __( 'Footer Sidebar: Middle', 'mcshane' ),
+			'id'            => 'sidebar-footer-middle',
+			'description'   => __( 'The middle footer aside area.', 'mcshane' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget'  => '</aside>',
+			'before_title'  => '<h4 class="widget-title">',
+			'after_title'   => '</h4>',
+		) );
+
+		register_sidebar( array(
+			'name'          => __( 'Footer Sidebar: Right', 'mcshane' ),
+			'id'            => 'sidebar-footer-right',
+			'description'   => __( 'The right footer aside area.', 'mcshane' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget'  => '</aside>',
+			'before_title'  => '<h4 class="widget-title">',
+			'after_title'   => '</h4>',
+		) );
+
+		register_sidebar( array(
+			'name'          => __( 'Footer Sidebar: Sub', 'mcshane' ),
+			'id'            => 'sidebar-footer-sub',
+			'description'   => __( 'The sub-footer aside area.', 'mcshane' ),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget'  => '</aside>',
+			'before_title'  => '<h4 class="widget-title">',
+			'after_title'   => '</h4>',
+		) );		
+
 	}
-	
-	
+
+
 	/**
 	 * Add the Bootstrap "active" nav link class
 	 *
+	 * @access public
 	 * @since McShane 1.0
 	 */
 	public function nav_active_class($classes, $item)
@@ -221,50 +280,54 @@ class Theme_Functions
 	 * Retrieve the site's theme avatar
 	 *
 	 * Used for social media meta information
+	 *
+	 * @access public
 	 * @since McShane 1.0
 	 */
 	protected function _get_site_avatar_url()
 	{
-		$theme_img_dir = apply_filters('theme_img_dir', 'img');	
+		$theme_img_dir = apply_filters('theme_img_dir', 'img');
 		$theme_avatar_name = apply_filters('theme_avatar_name', 'site_avatar.png');
 		$avatar_url = '';
-		
+
 		$child_avatar_path = get_stylesheet_directory() . '/'. $theme_img_dir .'/' . $theme_avatar_name;
 		if( file_exists( $child_avatar_path ) ) {
 			$avatar_url = get_stylesheet_directory_uri() . '/'. $theme_img_dir .'/' . $theme_avatar_name;
 		}
-		
+
 		if( '' === $avatar_url ){
 			$parent_avatar_path = get_template_directory() . '/'. $theme_img_dir .'/' . $theme_avatar_name;
 			if( file_exists( $parent_avatar_path ) ) {
 				$avatar_url = get_template_directory_uri() . '/'. $theme_img_dir .'/' . $theme_avatar_name;
 			}
 		}
-		
+
 		return apply_filters('theme_avatar_url', $avatar_url);
 	}
-	
-	
+
+
 	/**
 	 * Chunk a string an XX characters
-	 * 
+	 *
+	 * @access public
 	 * @since McShane 1.0
 	 */
-	public function _abbreviate($text, $max = '95') 
+	public function _abbreviate($text, $max = '95')
 	{
 		if ( strlen($text) <= $max ){
 			return $text;
 		}
 		return substr($text, 0, $max-3) . '&#8230;';
-	}	
+	}
 
 
 	/**
 	 * Add Social meta tags
 	 *
-	 * Facebook & Twitter
+	 * @access public
+	 * @since McShane 1.0
 	 */
-	public function add_social_meta() 
+	public function add_social_meta()
 	{
 
 		global $wp_query;
@@ -280,7 +343,7 @@ class Theme_Functions
 			$meta_set = true;
 		}
 
-		// if we're on a Page, a Post 
+		// if we're on a Page, a Post
 		if( is_page() || is_singular('post') ){
 			$pagelink = get_permalink( $wp_query->queried_object->ID );
 			$pagetitle = $this->_abbreviate($wp_query->queried_object->post_title, '95');
@@ -329,13 +392,14 @@ class Theme_Functions
 	 * Create a nicely formatted and more specific title element text for output
 	 * in head of document, based on current view.
 	 *
-	 * @since 1.0
+	 * @access public
+	 * @since McShane 1.0
 	 *
 	 * @param string $title Default title text for current view.
 	 * @param string $sep Optional separator.
 	 * @return string The filtered title.
 	 */
-	public function wp_title( $title, $sep ) 
+	public function wp_title( $title, $sep )
 	{
 		global $paged, $page;
 
@@ -360,11 +424,12 @@ class Theme_Functions
 		return $title;
 	}
 
-	
+
 	/**
 	 * Load theme scripts
 	 *
-	 * @since 1.0
+	 * @access public
+	 * @since McShane 1.0
 	 */
 	public function load_front_scripts()
 	{
@@ -373,7 +438,7 @@ class Theme_Functions
 		}
 
 		wp_enqueue_script( self::THEME_PREFIX . '-main');
-		
+
 		#get_stylesheet_directory_uri
 		wp_localize_script(
 			self::THEME_PREFIX . '-main',
@@ -382,14 +447,15 @@ class Theme_Functions
 				'ajax_url' => admin_url( 'admin-ajax.php' ),
 				'theme_images_url' => get_stylesheet_directory_uri() . '/images/'
 			)
-		);		
+		);
 	}
 
 
 	/**
 	 * Load theme styles
 	 *
-	 * @since 1.0
+	 * @access public
+	 * @since McShane 1.0
 	 */
 	public function load_front_styles()
 	{
@@ -400,14 +466,15 @@ class Theme_Functions
 		}
 
 		wp_enqueue_style( self::THEME_PREFIX . '-main' );
-		
+
 	}
 
 
 	/**
 	 * Register parent scripts
 	 *
-	 * @since 1.0
+	 * @access public
+	 * @since McShane 1.0
 	 */
 	public function register_theme_scripts()
 	{
@@ -419,22 +486,22 @@ class Theme_Functions
 			'',
 			true
 		);
-		
+
 		wp_register_script(
 			'matchmedia',
 			get_template_directory_uri()  . '/js/matchMedia.js',
 			array( 'google-maps'),
 			'1',
 			true
-		);		
-		
+		);
+
 		wp_register_script(
 			'buggyfill',
 			get_template_directory_uri()  . '/js/viewport-units-buggyfill.js',
 			array( 'matchmedia'),
 			'0.4.1',
 			true
-		);	
+		);
 
 		wp_register_script(
 			'backgroundcover',
@@ -450,7 +517,7 @@ class Theme_Functions
 			array( 'backgroundcover'),
 			'1.1.1',
 			true
-		);	
+		);
 
 		wp_register_script(
 			'featherlight',
@@ -458,7 +525,7 @@ class Theme_Functions
 			array( 'lightSlider'),
 			'1.0.1',
 			true
-		);	
+		);
 
 
 		wp_register_script(
@@ -475,9 +542,9 @@ class Theme_Functions
 	/**
 	 * Register parent styles
 	 *
-	 * @since 1.0
+	 * @access public
+	 * @since McShane 1.0
 	 */
-
 	public function register_theme_styles()
 	{
 
@@ -491,14 +558,14 @@ class Theme_Functions
 			'1.0',
 			'all'
 		);
-		
+
 		wp_register_style(
 			'featherLight',
 			get_template_directory_uri()  . '/css/featherlight.min.css',
 			array('lightSlider'),
 			'1.0.1',
 			'all'
-		);	
+		);
 
 		wp_register_style(
 			'master',
@@ -506,7 +573,7 @@ class Theme_Functions
 			array('featherLight'),
 			'1.0',
 			'all'
-		);			
+		);
 
 		wp_register_style(
 			self::THEME_PREFIX . '-main',
@@ -515,15 +582,15 @@ class Theme_Functions
 			'1.0',
 			'all'
 		);
-		
+
 	}
 
 
 	/**
 	 * Register Google Font url
 	 *
-	 * @access  protected
-	 * @since   1.0
+	 * @access protected
+	 * @since McShane 1.0
 	 */
 	protected function _get_font_url()
 	{
@@ -558,7 +625,7 @@ class Theme_Functions
 	 * It's not needed for this theme.
 	 *
 	 * @access public
-	 * @since 1.0
+	 * @since McShane 1.0
 	 *
 	 * @uses wp_die()
 	 */
@@ -583,9 +650,9 @@ class Theme_Functions
 	/**
 	 * Add the Site's Favicon to the site header
 	*
-	* @access public
-	* @since 1.0
-	*/
+	 * @access public
+	 * @since McShane 1.0
+	 */
 	public function show_favicon()
 	{
 		$favicon_url = apply_filters('favicon_url', get_stylesheet_directory_uri().'/img/icon/favicon.ico');

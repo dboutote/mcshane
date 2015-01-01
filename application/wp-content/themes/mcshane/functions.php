@@ -39,7 +39,7 @@ show_admin_bar(false);
 /**
  * Custom Image Sizes
  */
-add_image_size( 'mcsh-gallery-thumb', 311, 233 );
+add_image_size( 'mcsh-gallery-thumb', 311, 233, true );
 
 
 /**

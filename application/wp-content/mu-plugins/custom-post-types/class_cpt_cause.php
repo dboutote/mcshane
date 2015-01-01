@@ -32,6 +32,7 @@ class CPT_Causes
 	public function __construct()
 	{
 		add_action( 'init', array($this, 'register_post_type'), 0 );
+		add_action( 'init', array($this, 'register_taxonomy_type'), 999 );
 		add_action( 'save_post_'.self::POST_TYPE, array($this,'save_meta'), 0, 3 );
 		#add_filter( 'include_subheader_dont_show_list', array($this, 'check_post_type'), 0,2);
 		add_filter( 'include_featquote_dont_show_list', array($this, 'check_post_type'), 0,2);
@@ -88,15 +89,14 @@ class CPT_Causes
 				'labels'                 => $labels,
 				'public'                 => true,
 				'exclude_from_search'    => true,
-				#'hierarchical'           => true,
+				'hierarchical'           => true,
 				'show_in_nav_menus'      => false,
 				'menu_icon'              => 'dashicons-heart',
 				'supports'               => array('title','editor','excerpt','thumbnail'),
 				'register_meta_box_cb'   => array(__CLASS__, 'create_metabox' ),
-				'taxonomies'             => array(),
+				'taxonomies'             => array('ctax_causetype'),
 				'has_archive'            => false,
 				'rewrite'                => array('slug' => 'causes', 'with_front' => false),
-				'query_var'              => false
 			)
 		);
 	}
@@ -159,7 +159,7 @@ class CPT_Causes
 				'default' => '0',
 				'title' => __('Menu Order'),
 				'description' => __( '', 'mcshane' )
-			),	
+			),
 		);
 
 		$args = array(
@@ -290,7 +290,61 @@ class CPT_Causes
 
 	 }
 
-}
 
+	/**
+	 * Register Taxonomy
+	 *
+	 * @access public
+	 * @since 1.0
+	 */
+	public function register_taxonomy_type()
+	{
+
+		$name = 'Cause Type';
+		$plural	= $name . 's';
+
+		register_taxonomy(
+			'ctax_causetype',    // Name of taxonomoy
+			self::POST_TYPE,          // Applies to these post types
+			array(
+				'label'                         => _x( $plural, 'taxonomy general name' ),			// A descriptive name for the taxonomy (marked for translation.)
+				'labels'                        => array(
+					'name'                          => _x( $plural, 'taxonomy general name' ),		// The plural form of the name of your taxonomoy shows
+					'singular_name'                 => _x( $name, 'taxonomy general name' ),        // The singular form of the name of your taxonomoy
+					'menu_name'                     => __( $plural),                           		// the menu name text. This string is the name to give menu items. Defaults to value of name
+					'all_items'                     => __( 'All ' . $plural ),                   	// the all items text. Default is __( 'All Tags' ) or __( 'All Categories' )
+					'edit_item'                     => __( 'Edit ' . $name ),                   	// the edit item text. Default is __( 'Edit Tag' ) or __( 'Edit Category' )
+					'view_item'                     => __( 'View ' . $name ),                   	// the view item text. Default is __( 'Edit Tag' ) or __( 'Edit Category' )
+					'update_item'                   => __( 'Update ' . $name ),                     // the update item text. Default is __( 'Update Tag' ) or __( 'Update Category' )
+					'add_new_item'                  => __( 'Add New '. $name ),                   	// the add new item text. Default is __( 'Add New Tag' ) or __( 'Add New Category' )
+					'new_item_name'                 => __( 'New ' . $name ),                    	// the new item name text. Default is __( 'New Tag Name' ) or __( 'New Category Name' )
+					'parent_item'                   => __( 'Parent ' . $name ),                     // the parent item text. This string is not used on non-hierarchical taxonomies such as post tags. Default is null or __( 'Parent Category' )
+					'parent_item_colon'             => __( 'Parent ' . $name.':' ),                 // The same as parent_item, but with colon : in the end null, __( 'Parent Category:' )
+					'search_items'                  => __( 'Parent ' . $plural ),                	// The search items text. Default is __( 'Search Tags' ) or __( 'Search Categories' )
+					#'popular_items'               => __( 'Popular Tags' ),                   		// the popular items text. Default is __( 'Popular Tags' ) or null
+					#'separate_items_with_commas'  => __( 'Separate tags with commas' ),      		// the separate item with commas text used in the taxonomy meta box. Default is __( 'Separate tags with commas' ), or null
+					#'add_or_remove_items'         => __( 'Add or remove tags' ),              		// the add or remove items text and used in the meta box when JavaScript is disabled. This string isn't used on hierarchical taxonomies. Default is __( 'Add or remove tags' ) or null
+					#'choose_from_most_used'       => __( 'Choose from the most used tags' ),  		// the choose from most used text used in the taxonomy meta box. This string isn't used on hierarchical taxonomies. Default is __( 'Choose from the most used tags' ) or null
+					#'not_found'                   => __('menuname')                           		// When no tags are found
+				),
+				'public'                        => true,                                        	// Should this taxonomy be exposed in the admin UI.
+				'show_ui'                       => true,                                       		// Whether to generate a default UI for managing this taxonomy. Default: if not set, defaults to value of public argument
+				'show_in_nav_menus'             => false,                                       	// should taxonomy be available for selection in navigation menus. Default: if not set, defaults to value of public argument
+				'show_tagcloud'                 => false,                                       	// Wether to allow the Tag Cloud widget to use this taxonomy. Default: if not set, defaults to value of show_ui argument
+				#'meta_box_cb'                   => null,                                        	// Provide a callback function name for the meta box display
+				'show_admin_column'             => true,                                       	// Whether to allow automatic creation of taxonomy columns on associated post-types table
+				'hierarchical'                  => true,                                        	// Is this taxonomy hierarchical (have descendants) like categories or not hierarchical like tags.
+				//'update_count_callback'       => null,
+				'rewrite'                       => array(                                       	// Set to false to prevent rewrite, or array to customize customize query var.
+					'slug'                          => '',                              		    // prepend posts with this slug - defaults to taxonomy's name
+					'with_front'                    => false                                    	// Whether your taxonomy should use the front base from your permalink settings
+				),
+				'query_var'                     => true                                         	// False to prevent queries, or string to customize query var. Default will use $taxonomy as query var
+			)
+		);
+	}
+
+
+}
 
 $CPT_Causes = new CPT_Causes();
