@@ -247,8 +247,10 @@ class Widget_Featured_Content extends WP_Widget {
 							$img_src = $image_obj[0];
 							$iw = $image_obj[1];
 							$ih = $image_obj[2];
+							$image_thumb_obj = wp_get_attachment_image_src( get_post_thumbnail_id(), 'mcsh-gallery-thumb');
+							$img_thumb_src = $image_thumb_obj[0];
 						}; ?>
-						<li data-thumb="<?php echo $img_src;?>">
+						<li data-thumb="<?php echo $img_thumb_src;?>">
 							<div class="left"><img src="<?php echo $img_src;?>" class="background-cover" width="<?php echo $iw;?>" height="<?php echo $ih;?>" /></div>
 							<div class="right">
 								<h2><?php get_the_title() ? the_title() : the_ID(); ?></h2>
