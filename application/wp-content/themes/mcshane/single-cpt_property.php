@@ -112,6 +112,14 @@ get_header(); ?>
 						'post_mime_type' => 'image',
 					)
 				);
+				
+				// if there are no property attachments, at least look for a featured thumb
+				if( empty ($attachments) ) {
+					if( has_post_thumbnail() ) {
+						$image_obj = wp_get_attachment_image_src( get_post_thumbnail_id(), 'full');
+						$attachments[get_post_thumbnail_id()] = $image_obj;
+					}
+				}
 
 				if ( !empty( $attachments ) ) {
 

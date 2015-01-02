@@ -22,4 +22,4 @@ include_once( dirname( __FILE__ ) . '/class_cpt_office.php' );
 include_once( dirname( __FILE__ ) . '/news-posts/class_cpt_news.php' );
 
 // Call the Property Post Type
-include_once( dirname( __FILE__ ) . '/class_cpt_property.php' );
+include_once( dirname( __FILE__ ) . '/property/class_cpt_property.php' );

@@ -39,7 +39,7 @@ class CPT_Properties
 		#add_filter( 'include_featquote_dont_show_list', array($this, 'check_post_type'), 0,2 );
 		add_filter( 'mb_subheader_metabox_title', array($this, 'subheader_metabox_title'), 0,1 );
 		add_filter( 'mb_subheader_metabox_description', array($this, 'subheader_metabox_description'), 0,1 );
-		add_action( 'after_gallery_item_title', array($this, 'display_gallery_item_subheader'), 9, 1 );
+		#add_action( 'after_gallery_item_title', array($this, 'display_gallery_item_subheader'), 9, 1 );
 	}
 
 	/**
@@ -526,3 +526,9 @@ function mcsh_get_property_photos( $post_id = null ) {
 }
 
 $CPT_Properties = new CPT_Properties();
+
+// Call the Full Header meta box
+include_once( dirname( __FILE__ ) . '/class_mb_property_gallery.php' );
+
+
+$MetaBox_PropertyGallery = new MetaBox_PropertyGallery();
