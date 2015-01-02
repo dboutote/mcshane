@@ -134,6 +134,10 @@ class CPT_Galleries
 						<?php foreach($_gallery_items as $_gallery_item) { ?>
 							<?php
 							$id = (int)$_gallery_item['ID'];
+							$gallery_post = get_post($id);
+							if( is_null($gallery_post) || 'publish' != $gallery_post->post_status){
+								continue;
+							}
 							$the_title = $_gallery_item['name'];
 							$is_featured = ( isset($_gallery_item['featured']) ) ? true : false;
 							?>
