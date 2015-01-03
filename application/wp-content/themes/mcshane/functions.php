@@ -178,7 +178,7 @@ function get_children_pages($parent_id){
 				"
 				SELECT *, m.meta_value as sub_section 
 				FROM $wpdb->posts AS p
-				INNER JOIN `mcshane`.`wp_postmeta` AS m ON m.post_id = P.ID
+				INNER JOIN $wpdb->postmeta AS m ON m.post_id = P.ID
 				WHERE 1=1 
 				AND p.ID IN (
 					SELECT post_id
