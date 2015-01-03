@@ -15,10 +15,18 @@ $_tax = 'ctax_proptype';
 $_terms = wp_get_object_terms( $postid,  $_tax );
 $parent_tax_name = ( !is_wp_error($_terms) && count($_terms) > 0 ) ? $_terms[0]->name : '' ;
 $parent_tax_slug = ( !is_wp_error($_terms) && count($_terms) > 0 ) ? $_terms[0]->slug : '' ;
+
 $site_section = false;
 $_site_section = get_post_meta($postid, '_site_section', true);
 if($_site_section){
 	$site_section = get_post($_site_section);
+}
+
+$_site_sub_section = get_post_meta($postid, '_site_sub_section', true);
+
+if( $_site_sub_section ){
+	$ancestors = array_reverse(get_post_ancestors($_site_sub_section));
+	$ancestors[] = $_site_sub_section;
 }
 
 // property meta
@@ -54,18 +62,12 @@ get_header(); ?>
 
 		<ul>
 			<li><a href="<?php echo esc_url( home_url() );?>">Home</a></li>
-			<?php if( $site_section ) { ?>
-				/ <li><a href="<?php echo get_permalink( $site_section->ID ) ?>"><?php _e($site_section->post_title); ?></a></li>
-				<?php if('' !== $parent_tax_slug ) { ?>
-					/ <li><a href="<?php echo get_permalink( get_page_by_path( $site_section->post_name . '/' . sanitize_title($parent_tax_slug) ) ); ?>"><?php _e($parent_tax_name); ?></a></li>
-					<?php if( $is_available ) { ?>
-						/ <li><a href="<?php echo get_permalink( get_page_by_path( $site_section->post_name . '/' . sanitize_title($parent_tax_slug) . '/available-properties' ) ); ?>"><?php _e('Available Properties'); ?></a></li>
-					<?php }; ?>
-					<?php if( $is_representative ) { ?>
-						/ <li><a href="<?php echo get_permalink( get_page_by_path( $site_section->post_name . '/' . sanitize_title($parent_tax_slug) . '/representative-projects' ) ); ?>"><?php _e('Representative Projects'); ?></a></li>
-					<?php }; ?>
-				<?php }; ?>
-			<?php }; ?>
+			<?php if( !empty($ancestors) ) {
+				foreach( $ancestors as $k => $id ) {
+					$p = get_post($id);
+					echo ' / <li><a href="' . get_permalink($id) .'" >' . $p->post_title . '</a></li>';
+				};
+			} ?>
 			/ <li><?php the_title();?></li>
 		</ul>
 
@@ -81,7 +83,17 @@ get_header(); ?>
 <div class="content container clearfix">
 
 	<div class="left">
-		[hierarchal nav]
+		<?php
+		$child_pages = get_children_pages( $_site_section );
+
+		if( !empty($child_pages) ) {
+			$walker = new Walker_SideNav;
+			$args = array($child_pages, 0);
+			echo '<nav><ul>';
+			echo call_user_func_array(array($walker, 'walk'), $args);
+			echo '</ul></nav>';
+		} ?>
+		&nbsp;
 	</div> <!-- /.left -->
 
 	<div class="right">

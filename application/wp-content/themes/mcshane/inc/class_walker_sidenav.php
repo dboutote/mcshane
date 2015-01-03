@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * Create HTML list of pages.
@@ -30,7 +30,7 @@ class Walker_SideNav extends Walker {
 	 * @param int $depth Depth of page. Used for padding.
 	 * @param array $args
 	 */
-	public function start_lvl( &$output, $depth = 0, $args = array() ) 
+	public function start_lvl( &$output, $depth = 0, $args = array() )
 	{
 		$indent = str_repeat("\t", $depth);
 		$output .= "\n$indent<ul class='children'>\n";
@@ -59,11 +59,11 @@ class Walker_SideNav extends Walker {
 	 * @param int $current_page Page ID.
 	 * @param array $args
 	 */
-	public function start_el( &$output, $page, $depth = 0, $args = array(), $current_page = 0 ) 
-	{	
-	
+	public function start_el( &$output, $page, $depth = 0, $args = array(), $current_page = 0 )
+	{
+
 		$current_page = get_queried_object_id();
-		
+
 		if ( $depth ) {
 			$indent = str_repeat( "\t", $depth );
 		} else {
@@ -78,6 +78,7 @@ class Walker_SideNav extends Walker {
 
 		if ( ! empty( $current_page ) ) {
 			$_current_page = get_post( $current_page );
+			
 			if ( $_current_page && in_array( $page->ID, $_current_page->ancestors ) ) {
 				$css_class[] = 'current_page_ancestor';
 				$css_class[] = 'active';
@@ -108,7 +109,7 @@ class Walker_SideNav extends Walker {
 		 * @param array   $args         An array of arguments.
 		 * @param int     $current_page ID of the current page.
 		 */
-		$css_classes = implode( ' ', apply_filters( 'page_css_class', $css_class, $page, $depth, $args, $current_page ) );
+		$css_classes = implode( ' ', apply_filters( 'sidenav_page_css_class', $css_class, $page, $depth, $args, $current_page ) );
 
 		if ( '' === $page->post_title ) {
 			$page->post_title = sprintf( __( '#%d (no title)' ), $page->ID );
@@ -118,9 +119,9 @@ class Walker_SideNav extends Walker {
 		$args['link_after'] = empty( $args['link_after'] ) ? '' : $args['link_after'];
 
 		/** This filter is documented in wp-includes/post-template.php */
-		
-		$toggle_span = ( $this->has_children ) ? '<span class="toggle">+</span>' : '' ; 
-		
+
+		$toggle_span = ( $this->has_children ) ? '<span class="toggle">+</span>' : '' ;
+
 		$output .= $indent . sprintf(
 			'<li class="%s">%s<a href="%s">%s%s%s</a>',
 			$css_classes,
@@ -143,7 +144,7 @@ class Walker_SideNav extends Walker {
 	 * @param int $depth Depth of page. Not Used.
 	 * @param array $args
 	 */
-	public function end_el( &$output, $page, $depth = 0, $args = array() ) 
+	public function end_el( &$output, $page, $depth = 0, $args = array() )
 	{
 		$output .= apply_filters('end_el_sidenav', "</li>\n", $page);
 	}

@@ -53,6 +53,33 @@ class MetaBox_SiteSection {
 
 		return $pages;
 	}
+	
+	
+	/**
+	 * Get a list of all non-top-level pages
+	 *
+	 * @access  protected
+	 * @since   1.0
+	 * @return  array $pages 
+ 	 */
+	protected static function _get_all_pages()
+	{
+		global $wpdb;
+		$pages = $wpdb->get_results(
+			$wpdb->prepare(
+				"
+				SELECT ID, post_title
+				FROM $wpdb->posts
+				WHERE post_status = 'publish'
+				AND post_type = %s				
+				ORDER BY post_title ASC
+				",
+				'page'
+			)
+		);
+
+		return $pages;
+	}	
 
 
 	/**
@@ -97,6 +124,13 @@ class MetaBox_SiteSection {
 				'title' => __('Site Section'),
 				'description' => sprintf( __( 'Select the Site Section for this %s. <em>(Used for site navigation.)</em>', 'mcshane' ), $post_type_name_lower ),
 			),
+			'site_sub_section' => array(
+				'name' => 'site_sub_section',
+				'type' => 'select',
+				'default' => '',
+				'title' => __('Site Sub Section'),
+				'description' => sprintf( __( 'Select the Site Sub Section for this %s. <em>(Used for site navigation.)</em>', 'mcshane' ), $post_type_name_lower ),
+			),			
 		);
 
 		$args = array(
@@ -205,6 +239,30 @@ class MetaBox_SiteSection {
 				$output .= '<p><label for="'.$meta_field['name'].'">'.$meta_field['description'].'</label><br />';				
 				$output .= '<select class="widefat" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'">'.$options.'</select></p>';
 			}
+			
+			if ( 'site_sub_section' === $meta_field['name']) {
+				$pages = self::_get_all_pages();				
+				$options = '<option value="-1">-- Select a Site Sub Section --</option>';
+				if( count($pages) > 0 ){
+					foreach( $pages as $p ){
+						$selected = ( (int)$p->ID === (int) $meta_field_value) ? 'selected="selected"' : '';
+						$options .= "<option value='".$p->ID."' {$selected} >".$p->post_title."</option>";		
+					}
+				}
+				
+				$output .= '<p><label for="'.$meta_field['name'].'">'.$meta_field['description'].'</label><br />';	
+				$output .= wp_dropdown_pages( array(
+					'name' => $meta_field['name'],
+					'id' => $meta_field['name'],
+					'show_option_none' => '-- Select a Site Sub Section --',
+					'echo' => 0,
+					'selected' => (int) $meta_field_value
+				) );
+				$output .= '</p>';
+
+							
+				#$output .= '<select class="widefat" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'">'.$options.'</select></p>';
+			}			
 
 		}
 

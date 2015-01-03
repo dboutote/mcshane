@@ -157,7 +157,10 @@ function get_top_ancestor_id(){
 }
 
 function get_children_pages($parent_id){
-	$parent_id = ( null === $parent_id ) ? get_the_ID() : $parent_id;	
+
+	$parent_id = ( null === $parent_id ) ? get_the_ID() : $parent_id;
+
+	$children = array();	
 	
 	$children = get_pages( array(
 		'sort_order' => 'ASC',
@@ -165,6 +168,41 @@ function get_children_pages($parent_id){
 		#'parent' => $parent_id,
 		'child_of' => $parent_id
 	) );
+	
+	#debug($children);
+	
+	#if( ! empty($children) ){
+		global $wpdb;
+		$more = $wpdb->get_results(
+			$wpdb->prepare(
+				"
+				SELECT *, m.meta_value as sub_section 
+				FROM $wpdb->posts AS p
+				INNER JOIN `mcshane`.`wp_postmeta` AS m ON m.post_id = P.ID
+				WHERE 1=1 
+				AND p.ID IN (
+					SELECT post_id
+					FROM $wpdb->postmeta
+					WHERE 1=1
+					AND meta_key = '_site_section'
+					AND meta_value = %d
+				)
+				AND p.post_status = 'publish'
+				AND m.meta_key = '_site_sub_section'
+				ORDER BY menu_order ASC
+				",
+				$parent_id
+			)
+		);
+		
+		if( ! empty($more) ) {		
+			foreach($more as $item){
+				$item->post_parent = (int) $item->sub_section;
+				$item->ID = (int) $item->ID;
+				$children[] = $item;
+			}
+		}
+	#}
 	return $children;
 }
 
@@ -191,15 +229,20 @@ function mcsh_bc_trail($html){
 }
 
 
-add_filter('page_css_class', 'sidenav_page_css_class', 0,5 );
+add_filter('sidenav_page_css_class', 'sidenav_page_css_class', 0,5 );
 
 function sidenav_page_css_class($css_class, $page, $depth, $args, $current_page){
-	#debug($css_class);
-	#debug($page);
-	#debug($depth);
-	#debug($args);
-	#debug($current_page);
 	
-	
+	if ( ! empty( $current_page ) ) {
+		$_site_sub_section = get_post_meta($current_page, '_site_sub_section', true);
+		if( $_site_sub_section ){
+			$ancestors = array_reverse(get_post_ancestors($_site_sub_section));
+			$ancestors[] = $_site_sub_section;
+			if( in_array( $page->ID, $ancestors ) ) {
+				$css_class[] = 'active';
+			}
+		}		
+	}
+		
 	return $css_class;
 }
