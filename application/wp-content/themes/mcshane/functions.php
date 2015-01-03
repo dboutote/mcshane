@@ -194,8 +194,7 @@ function get_children_pages($parent_id){
 				$parent_id
 			)
 		);
-		debug($parent_id);
-		debug($more);
+		
 		if( ! empty($more) ) {		
 			foreach($more as $item){
 				$item->post_parent = (int) $item->sub_section;
