@@ -34,6 +34,9 @@ if ( ! class_exists( '\McShane\Theme_Functions' ) && 'plugins.php' !== $GLOBALS[
 	require get_template_directory() . '/inc/class_theme-functions.php';
 }
 
+require get_template_directory() . '/inc/class_walker_sidenav.php';
+
+
 show_admin_bar(false);
 
 /**
@@ -136,6 +139,37 @@ function show_siblings($post_id = null){
 
 
 /**
+ * Gets the id of the topmost ancestor of the current page. Returns the current
+ * page's id if there is no parent.
+ * 
+ * @uses object $post
+ * @return int 
+ */
+function get_top_ancestor_id(){
+    global $post;
+    
+    if($post->post_parent){
+        $ancestors = array_reverse(get_post_ancestors($post->ID));
+        return $ancestors[0];
+    }
+    
+    return $post->ID;
+}
+
+function get_children_pages($parent_id){
+	$parent_id = ( null === $parent_id ) ? get_the_ID() : $parent_id;	
+	
+	$children = get_pages( array(
+		'sort_order' => 'ASC',
+		'sort_column' => 'menu_order',
+		#'parent' => $parent_id,
+		'child_of' => $parent_id
+	) );
+	return $children;
+}
+
+
+/**
  * Wrap breadcrumb items in <li> yags
  */
 add_filter('breadcrumb_trail_items', 'mcsh_bc_items');
@@ -154,4 +188,18 @@ add_filter('breadcrumb_trail', 'mcsh_bc_trail');
 function mcsh_bc_trail($html){
 	$html = str_replace('breadcrumb-trail breadcrumbs', 'breadcrumb-trail', $html);
 	return $html;
+}
+
+
+add_filter('page_css_class', 'sidenav_page_css_class', 0,5 );
+
+function sidenav_page_css_class($css_class, $page, $depth, $args, $current_page){
+	#debug($css_class);
+	#debug($page);
+	#debug($depth);
+	#debug($args);
+	#debug($current_page);
+	
+	
+	return $css_class;
 }

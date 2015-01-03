@@ -54,13 +54,23 @@ get_header(); ?>
 	</div> <!-- /.bg-slider -->
 
 	<div class="left">
-		[hierarchal nav]
+		<?php 
+		$child_pages = get_children_pages( get_top_ancestor_id() );
+				
+		if( !empty($child_pages) ) {
+			$walker = new Walker_SideNav;
+			$args = array($child_pages, 0);
+			echo '<nav><ul>';
+			echo call_user_func_array(array($walker, 'walk'), $args);
+			echo '</ul></nav>';
+		} ?>
+		&nbsp;
 	</div> <!-- /.left -->
 
 	<div class="right">
 
 		<div class="landing-content">
-
+				
 			<?php while ( have_posts() ) : the_post(); ?>
 
 				<h2><?php the_title();?></h2>
