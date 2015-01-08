@@ -169,7 +169,7 @@ get_header(); ?>
 
 				<div class="property-page-left">
 
-					<?php if ( !empty( $attachments ) ) {  ?>
+					<?php if ( !empty( $attachments ) && count($attachments) > 1 ) {  ?>
 
 						<h3>Project Photos</h3>
 						<div class="property-gallery">
