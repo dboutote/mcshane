@@ -132,7 +132,21 @@ $(document).ready(function() {
 	});
 });
 
-
+/* ----- MOBILE MENU FUNCTIONS ----- */
+$(document).ready(function() {
+	var mobileButton = $('#mobile-menu'),
+	mobileMenu = $('header nav ul#main'),
+	menuEntry = $('header nav ul#main > li');
+	
+	mobileButton.click(function() {
+		mobileMenu.toggleClass('active');
+	});
+	
+	menuEntry.click(function() {
+		$(this).toggleClass('active');
+		$('> a', this).trigger('mouseover');
+	});
+});
 
 /* ----- LEFT NAV FUNCTIONS ----- */
 $(document).ready(function() {
