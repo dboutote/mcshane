@@ -161,7 +161,7 @@ header nav ul#social li a:hover {
 header nav ul#social li a img {
 	max-width: 60%;
 	height: auto;
-	padding: 8px 0;
+	padding: 6.5px 0;
 	margin: 0 auto;
 	display: block;
 }
@@ -484,7 +484,7 @@ header nav ul#main > li .drop-down ul.sub-menu > li > a:hover {
 }
 .content .left nav > ul > li > a, footer nav > ul > li > a:visited {
 	display: inline-block;
-	padding: 6px 10px 6px 0;
+	padding: 3px 10px 2px 0;
 	margin-left: 10px;
 	color: #000;
 	font-weight: 700;
@@ -514,7 +514,7 @@ header nav ul#main > li .drop-down ul.sub-menu > li > a:hover {
 }
 .content .left nav > ul > li > ul > li > a, .content .left nav > ul > li > ul > li > a:visited {
 	font-weight: 300;
-	padding: 6px 10px 6px 0;
+	padding: 2px 10px 0 0;
 	margin-left: 10px;
 	color: #000 !important;
 	text-transform: none;
@@ -528,10 +528,10 @@ header nav ul#main > li .drop-down ul.sub-menu > li > a:hover {
 }
 .content .left nav > ul > li > ul > li > ul {
 	background-color: #fff;
-	padding: 10px 0;
+	padding: 4px 0;
 }
 .content .left nav > ul > li > ul > li > ul > li {
-	padding: 2px 10px;
+	padding:0 10px;
 }
 .content .left nav > ul > li > ul > li > ul > li > a {
 	font-size: 10px;
