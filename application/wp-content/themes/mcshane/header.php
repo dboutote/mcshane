@@ -46,6 +46,10 @@
 				<li><a href="#"><img src="<?php echo get_stylesheet_directory_uri();?>/images/newsletter.svg"/></a></li>
 			</ul>
 			
+			<ul id="mobile-menu">
+				<li><a href="#"><img src="images/mobile-menu.svg"/></a></li>
+			</ul>
+			
 			<ul id="main">
 				<?php 
 				$menu_args = array(
