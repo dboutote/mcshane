@@ -47,7 +47,7 @@
 			</ul>
 			
 			<ul id="mobile-menu">
-				<li><a href="#"><img src="images/mobile-menu.svg"/></a></li>
+				<li><a href="#"><img src="<?php echo get_stylesheet_directory_uri();?>/images/mobile-menu.svg"/></a></li>
 			</ul>
 			
 			<ul id="main">
