@@ -52,11 +52,13 @@
 			
 			<ul id="main">
 				<?php 
+				$callout_walker = new Walker_Callout();
 				$menu_args = array(
 					'container'=> false,
 					'fallback_cb' => false,		
 					'items_wrap' => '%3$s',					
-					'theme_location' => 'primary'
+					'theme_location' => 'primary',
+					'walker' => $callout_walker
 				); ?>
 				<?php wp_nav_menu($menu_args); ?>
 			</ul>

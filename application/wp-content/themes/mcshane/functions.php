@@ -35,6 +35,7 @@ if ( ! class_exists( '\McShane\Theme_Functions' ) && 'plugins.php' !== $GLOBALS[
 }
 
 require get_template_directory() . '/inc/class_walker_sidenav.php';
+require get_template_directory() . '/inc/class_walker_callout.php';
 
 
 show_admin_bar(false);
@@ -229,6 +230,10 @@ function mcsh_bc_trail($html){
 }
 
 
+
+/** 
+ * Add the active class to the sidebar navigation
+ */
 add_filter('sidenav_page_css_class', 'sidenav_page_css_class', 0,5 );
 
 function sidenav_page_css_class($css_class, $page, $depth, $args, $current_page){
@@ -246,3 +251,56 @@ function sidenav_page_css_class($css_class, $page, $depth, $args, $current_page)
 		
 	return $css_class;
 }
+
+
+
+/**
+ * Add "callout" class to nav menus
+ */
+function add_callout_menuclass($atts, $item, $args) {
+	if( is_array($atts) && !empty($atts['rel']) && $atts['rel'] = 'callout' ) {
+		$atts['class'] = 'callout';
+		#$atts['data-lightbox-type'] = 'inline';
+	}
+	
+	return $atts;
+    
+}
+add_filter('nav_menu_link_attributes','add_callout_menuclass', 0,3);
+
+
+/**
+ * Add description to nav menus for callout items
+ */
+function add_callout_description( $item_description, $atts, $item, $args ) {
+	if( is_array($atts) && !empty($atts['rel']) && $atts['rel'] = 'callout' ) {	
+		$item_desc_original = $item_description;
+		$item_description = '<br />';
+		$item_description .= $item_desc_original;		
+	}
+	
+	return $item_description;
+    
+}
+add_filter( 'nav_menu_item_description', 'add_callout_description', 0, 4);
+
+
+/**
+ * Add shortcode capability to nav menus for callout links
+ */
+add_filter( 'nav_menu_item_description', 'do_shortcode' );
+function callout_nav_image( $atts, $content = null, $code = '' ){
+
+		extract(shortcode_atts(array(
+			'url' => ''
+		), $atts));
+		
+		if( '' == $url ) {
+			return;
+		}
+		
+		$content = '<img src="' . $url . '" />';
+		
+		return $content;
+}
+add_shortcode( 'nav_img', 'callout_nav_image' );
