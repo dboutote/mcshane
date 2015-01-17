@@ -150,6 +150,13 @@ $(document).ready(function() {
 
 /* ----- LEFT NAV FUNCTIONS ----- */
 $(document).ready(function() {
+	
+	$('.left nav ul li.active .children').each( function(){
+		if( $(this).is(':visible') ){
+			$(this).siblings('.toggle').html('-');
+		}
+	});
+	
 	$('.left nav .toggle').click(function() {
 		var theToggle = $(this),
 		theSubMenu = theToggle.siblings('ul');
@@ -157,7 +164,7 @@ $(document).ready(function() {
 			theToggle.html('+');
 		}
 		else {
-			theToggle.html('–');
+			theToggle.html('-');
 		}
 		theSubMenu.slideToggle();
 	});

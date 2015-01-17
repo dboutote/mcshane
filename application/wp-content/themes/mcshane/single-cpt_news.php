@@ -83,7 +83,7 @@ get_header(); ?>
 
 		<div class="clearfix">
 			<?php if( has_fullheader($postid) ) { ?> <h3><?php display_fullheader($postid); ?></h3> <?php } ?>
-			<div class="location"><?php echo get_the_date(); ?></div>
+			<div class="location"><?php if( has_subheader() ) {?> <?php display_subheader(); } ?></div>
 		</div>
 
 		<?php while ( have_posts() ) : the_post(); ?>

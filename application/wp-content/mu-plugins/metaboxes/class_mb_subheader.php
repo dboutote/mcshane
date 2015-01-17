@@ -22,7 +22,7 @@ class MetaBox_SubHeader {
 	{
 		add_action( 'add_meta_boxes', array($this,'create_metabox') );
 		add_action( 'save_post',      array($this,'save_meta'), 0, 3 );
-		add_action( 'edit_form_after_title', array($this,'move_meta_box') );
+		add_action( 'edit_form_after_title', array($this,'move_meta_box'), 999 );
 	}
 	
 	

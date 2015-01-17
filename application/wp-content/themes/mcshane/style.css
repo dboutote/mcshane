@@ -20,3 +20,7 @@ Text Domain: mcshane
     content: "";
     display: inline;
 }
+
+.content .left nav li.active > ul.children {
+	display: block;
+}

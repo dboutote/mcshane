@@ -96,7 +96,7 @@ class CPT_FeatLink
 					<div class="left">
 						<?php if($_flink_url) { ?>
 							<a href="<?php echo esc_url($_flink_url);?>"><img src="<?php echo get_stylesheet_directory_uri();?>/images/arrow.svg"></a>
-							<div class="title"><?php echo apply_filters('the_title', $post_object->post_title);?></div>
+							<div class="title"><a href="<?php echo esc_url($_flink_url);?>"><?php echo apply_filters('the_title', $post_object->post_title);?></a></div>
 							<div class="content"><?php echo $post_object->post_excerpt;?></div>
 						<?php }; ?>
 					</div>
@@ -107,7 +107,9 @@ class CPT_FeatLink
 						$img_width = $image_obj[1];
 						$img_height = $image_obj[2]; ?>
 						<div class="right">
-							<img src="<?php echo $img_src;?>" width="<?php echo $img_width;?>" height="<?php echo $img_height;?>" class="background-cover" alt="" />
+							<a href="<?php echo esc_url($_flink_url);?>">
+								<img src="<?php echo $img_src;?>" width="<?php echo $img_width;?>" height="<?php echo $img_height;?>" class="background-cover" alt="" />
+							</a>
 						</div>
 					<?php } ?>
 					

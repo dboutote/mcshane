@@ -35,7 +35,7 @@ class CPT_News
 		add_action( 'init', array($this, 'register_post_type'), 0 );
 		add_action( 'init', array($this, 'register_taxonomy'), 999 );
 		add_action( 'save_post_'.self::POST_TYPE, array($this,'save_meta'), 0, 3 );
-		add_filter( 'include_subheader_dont_show_list', array($this, 'check_post_type'), 0,2);
+		#add_filter( 'include_subheader_dont_show_list', array($this, 'check_post_type'), 0,2);
 		add_filter( 'include_featquote_dont_show_list', array($this, 'check_post_type'), 0,2);
 		add_filter( 'manage_'.self::POST_TYPE.'_posts_columns', array($this, 'add_new_columns') );
 		add_action( 'manage_'.self::POST_TYPE.'_posts_custom_column', array($this,'add_column_data'), 10, 2 );

@@ -20,7 +20,7 @@ class MetaBox_FullHeader {
  	 */
 	public function __construct()
 	{
-		add_action( 'add_meta_boxes_cpt_news', array($this,'create_metabox') );
+		add_action( 'add_meta_boxes_cpt_news', array($this,'create_metabox'), 0 );
 		add_action( 'save_post',      array($this,'save_meta'), 0, 3 );
 		add_action( 'edit_form_after_title', array($this,'move_meta_box') );
 	}
@@ -40,7 +40,7 @@ class MetaBox_FullHeader {
 		global $post, $wp_meta_boxes;
 
 		# Output the "advanced" meta boxes:
-		do_meta_boxes(get_current_screen(), 'advancedcpt_news', $post);
+		do_meta_boxes(get_current_screen(), 'advanced_cpt_news', $post);
 
 		return;
 	}
@@ -95,7 +95,7 @@ class MetaBox_FullHeader {
 			'meta_box_default' => '',
 			'meta_box_description' => sprintf( __( 'Enter an optional full title for this %s.', 'rinsight' ), $post_type_name ),
 			'content_types' => $post_types,
-			'meta_box_position' => 'advancedcpt_news',
+			'meta_box_position' => 'advanced_cpt_news',
 			'meta_box_priority' => 'high',
 			'meta_fields' => $meta_fields
 		);
