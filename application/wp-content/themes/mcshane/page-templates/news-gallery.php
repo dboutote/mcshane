@@ -47,15 +47,9 @@ get_header(); ?>
 
 	<div class="right">
 
-		<?php if( $post && $post->post_parent > 0 ) { ?>
-
-			<h1><?php echo get_post( $post->post_parent )->post_title;?></h1>
-
-			<hr />
-
-		<?php } ?>
-
 		<?php while ( have_posts() ) : the_post(); ?>
+		
+			<h2><?php the_title();?></h2>
 
 			<?php the_content();?>
 
@@ -94,8 +88,6 @@ get_header(); ?>
 		); ?>
 
 		<?php if ($r->have_posts()) : ?>
-
-			<h3><?php echo $_term->name;?></h3>
 
 			<div class="gallery clearfix">
 
