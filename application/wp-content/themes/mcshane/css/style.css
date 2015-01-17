@@ -529,7 +529,7 @@ header nav ul#main > li .drop-down ul.sub-menu > li > a:hover {
 }
 .content .left nav > ul > li > ul > li > ul {
 	background-color: #fff;
-	padding: 4px 0;
+	padding: 8px 0 4px 0;
 }
 .content .left nav > ul > li > ul > li > ul > li {
 	padding:0 10px;
@@ -540,6 +540,8 @@ header nav ul#main > li .drop-down ul.sub-menu > li > a:hover {
 	color: #000 !important;
 	padding: 4px 18px;
 	text-transform: none;
+	line-height: 1.5em;
+	display: block;
 }
 .content .left nav > ul > li > ul > li > ul > li.active a, .content .left nav > ul > li > ul > li > ul > li.active a:visited {
 	color: #b03a0a !important;
