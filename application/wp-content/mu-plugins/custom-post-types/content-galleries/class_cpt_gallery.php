@@ -210,7 +210,7 @@ class CPT_Galleries
 		}
 
 		$tax_query = array();
-		$number = 10;
+		$number = -1;
 
 		// build query
 		$r = new WP_Query(
@@ -272,7 +272,7 @@ class CPT_Galleries
 		}
 
 		$tax_query = array();
-		$number = 10;
+		$number = -1;
 		$paged = absint( $raw_data['paged'] );
 
 		// build query
@@ -643,7 +643,7 @@ class CPT_Galleries
 
 						<?php
 						$original_post = $post;
-						$posts_per_page = 10;
+						$posts_per_page = -1;
 						$curr_page = 1;
 
 						$post_args = array(
