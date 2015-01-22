@@ -459,7 +459,7 @@ class Theme_Functions
 	 */
 	public function load_front_styles()
 	{
-		$font_url = $this->_get_font_url();
+		$font_url = self::_get_font_url();
 
 		if ( ! empty( $font_url ) ) {
 			wp_enqueue_style( self::THEME_PREFIX .'-fonts', esc_url_raw( $font_url ), array(), null );
@@ -592,7 +592,7 @@ class Theme_Functions
 	 * @access protected
 	 * @since McShane 1.0
 	 */
-	protected function _get_font_url()
+	protected static function _get_font_url()
 	{
 		$fonts_url = '';
 

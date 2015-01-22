@@ -31,22 +31,22 @@ class CTax_MetaFields
 		add_action( 'create_ctax_teamdepartment', array($this,'save_taxonomy_meta'), 10, 2 );
 		add_action( 'edited_ctax_teamdepartment', array($this,'save_taxonomy_meta'), 10, 2 );
 		add_action( 'delete_ctax_teamdepartment', array($this,'delete_taxonomy_meta'), 10, 3 );
-		
+
 		add_action( 'ctax_newstype_add_form_fields', array($this,'add_new_meta_field'), 10, 2 );
 		add_action( 'ctax_newstype_edit_form_fields', array($this,'edit_meta_field'), 10, 2 );
 		add_action( 'create_ctax_newstype', array($this,'save_taxonomy_meta'), 10, 2 );
 		add_action( 'edited_ctax_newstype', array($this,'save_taxonomy_meta'), 10, 2 );
-		add_action( 'delete_ctax_newstype', array($this,'delete_taxonomy_meta'), 10, 3 );		
-		
+		add_action( 'delete_ctax_newstype', array($this,'delete_taxonomy_meta'), 10, 3 );
+
 		add_action( 'get_terms', array($this,'get_terms'), 10, 3 );
-		
+
 	}
-	
-	
+
+
 	public function get_terms($terms, $taxonomies, $args)
 	{
 		#debug($terms);
-		
+
 		if( 'all' === $args['fields'] ) {
 			if( is_array($terms) && count($terms) > 0 ) {
 				foreach($terms as $term){
@@ -55,18 +55,18 @@ class CTax_MetaFields
 					if( $term_meta ){
 						foreach( $term_meta as $meta_key => $meta_value ) {
 								$term->$meta_key = $meta_value;
-						}						
-					}					
+						}
+					}
 				}
-			}			
+			}
 		}
-		
+
 		return $terms;
 	}
-	
-	
-	
-	
+
+
+
+
 	/**
 	 * Saves meta field for taxonomy term
 	 *
@@ -82,8 +82,8 @@ class CTax_MetaFields
 	{
 		delete_option("tax_meta_$tt_id");
 	}
-	
-	
+
+
 	/**
 	 * Saves meta field for taxonomy term
 	 *
@@ -95,6 +95,10 @@ class CTax_MetaFields
 	 */
 	public function save_taxonomy_meta( $term_id, $tt_id )
 	{
+
+		if( !isset($_POST['term_meta']) ) {
+			return $term_id;
+		}
 
 		$meta_keys = array_keys( $_POST['term_meta'] );
 
@@ -140,7 +144,7 @@ class CTax_MetaFields
 	 */
 	public function edit_meta_field($term)
 	{
-		
+
 		// put the term ID into a variable
 		$tt_id = $term->term_taxonomy_id;
 
