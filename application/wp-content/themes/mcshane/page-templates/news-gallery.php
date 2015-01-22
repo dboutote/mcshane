@@ -56,12 +56,13 @@ get_header(); ?>
 		<?php endwhile; ?>
 
 		<?php
-		$_tax_terms = get_post_meta(get_the_ID(), '_tax_terms', true);
-		$_p_type = get_post_meta(get_the_ID(), '_p_type', true);
+		$_news_tax_terms = get_post_meta(get_the_ID(), '_news_tax_terms', true);
+		$_p_type = get_post_meta(get_the_ID(), '_news_p_type', true);
 		$_p_type = ( $_p_type ) ? $_p_type : 'post';
+		$tax_query = array();
 
-		if( '' !== $_tax_terms ){
-			$meta_tax = explode(':', $_tax_terms);
+		if( '' !== $_news_tax_terms ){
+			$meta_tax = explode(':', $_news_tax_terms);
 			$selected_tax = $meta_tax[0];
 			$selected_term = $meta_tax[1];
 			$_term = get_term_by( 'slug', $selected_term, $selected_tax);

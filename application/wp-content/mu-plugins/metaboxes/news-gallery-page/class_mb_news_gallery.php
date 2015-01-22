@@ -53,7 +53,7 @@ class MetaBox_NewsGallery {
 
 
 		$taxonomies = get_taxonomies();
-		$selected_taxonomy = $_POST['tax_type'];
+		$selected_taxonomy = $_POST['news_tax_type'];
 		$selected_taxonomy_obj = get_taxonomy( $selected_taxonomy );
 
 		if( !in_array($selected_taxonomy, $taxonomies ) ){
@@ -161,22 +161,22 @@ class MetaBox_NewsGallery {
 		}
 
 		$meta_fields = array(
-			'p_type' => array(
-				'name' => 'p_type',
+			'news_p_type' => array(
+				'name' => 'news_p_type',
 				'type' => 'select',
 				'default' => '',
 				'title' => __('Post Type'),
 				'description' => __('Select which type of content to display on this page.')
 			),
-			'tax_type' => array(
-				'name' => 'tax_type',
+			'news_tax_type' => array(
+				'name' => 'news_tax_type',
 				'type' => 'select',
 				'default' => '',
 				'title' => __('Taxonomy'),
 				'description' => __('Select which category of entries will appear on this page.')
 			),
-			'tax_terms' => array(
-				'name' => 'tax_terms',
+			'news_tax_terms' => array(
+				'name' => 'news_tax_terms',
 				'type' => 'select',
 				'default' => '',
 				'title' => __('Category'),
@@ -276,7 +276,7 @@ class MetaBox_NewsGallery {
 
 			wp_nonce_field( plugin_basename(__CLASS__), $meta_field['name'].'_noncename' );
 			
-			if( 'p_type' === $meta_field['name'] ) {
+			if( 'news_p_type' === $meta_field['name'] ) {
 			
 				$output .= '<div id="newsgalleryptype">';
 
@@ -298,7 +298,7 @@ class MetaBox_NewsGallery {
 			}
 
 
-			if( 'tax_type' === $meta_field['name'] ) {
+			if( 'news_tax_type' === $meta_field['name'] ) {
 			
 				$output .= '<div id="newsgallerytaxonomy">';
 
@@ -319,7 +319,7 @@ class MetaBox_NewsGallery {
 				
 			}
 
-			if( 'tax_terms' === $meta_field['name'] ) {
+			if( 'news_tax_terms' === $meta_field['name'] ) {
 			
 				$output .= '<div id="newsgalleryterm">';
 			

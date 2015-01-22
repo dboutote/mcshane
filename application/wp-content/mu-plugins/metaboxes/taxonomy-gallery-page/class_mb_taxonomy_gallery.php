@@ -311,6 +311,7 @@ class MetaBox_TaxonomyGallery {
 			}
 
 			if( 'tax_terms' === $meta_field['name'] ) {
+		
 				$style = ' style="display:none;"';
 				$select_options = '';
 				if('' !== $selected_taxonomy){
@@ -394,13 +395,23 @@ class MetaBox_TaxonomyGallery {
 		// get configuration args
 		$args = $this->get_meta_box_args();
 		extract($args);
+		
 
 		foreach($meta_fields as $meta_field) {
-
 			// verify this came from the our screen and with proper authorization, (b/c save_post can be triggered at other times)
-			if( !isset($_POST[$meta_field['name'].'_noncename']) || !wp_verify_nonce( $_POST[$meta_field['name'].'_noncename'], __CLASS__ ) ) {
+			if( !isset( $_POST[$meta_field['name'].'_noncename'] ) ) {
 				return $post_id;
 			}
+			
+			if( !wp_verify_nonce( $_POST[$meta_field['name'].'_noncename'], __CLASS__ ) ) {
+debug( $meta_field );			
+debug( $_POST[$meta_field['name'].'_noncename'] );			
+debug( __CLASS__ );	
+debug(wp_verify_nonce( $_POST[$meta_field['name'].'_noncename'], __CLASS__ ));	
+debug($_POST);	
+wp_die(__METHOD__);	
+				return $post_id;
+			}			
 
 			// Ok, we're authenticated: we need to find and save the data
 			$data = ( isset($_POST[$meta_field['name']]) ) ? $_POST[$meta_field['name']] : '';

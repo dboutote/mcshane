@@ -25,7 +25,7 @@ jQuery(function ($) {
 		}
 	});
 	
-	$('select.tax-type').on('change', function(){
+	$('.tg-settings select.tax-type').on('change', function(){
 	
 		var $this = $(this);
 		var $parent = $this.closest('.tg-settings');

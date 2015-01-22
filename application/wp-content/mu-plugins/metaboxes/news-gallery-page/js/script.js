@@ -25,7 +25,7 @@ jQuery(function ($) {
 		}
 	});
 	
-	$('select.tax-type').on('change', function(){
+	$('.ng-settings select.tax-type').on('change', function(){
 	
 		var $this = $(this);
 		var $parent = $this.closest('.ng-settings');
@@ -40,7 +40,7 @@ jQuery(function ($) {
 		var request = $.ajax({
 			type : "POST",
 			url : ngJax.ajaxurl,
-			data : {plugin: "news-gallery", util_action: "get_news_terms", action:"setup_news_terms", tax_type:selected_type},
+			data : {plugin: "news-gallery", util_action: "get_news_terms", action:"setup_news_terms", news_tax_type:selected_type},
 			dataType : 'json'
 		}).done(function( response ) {
 			// -1 means an error, 1 means success	
