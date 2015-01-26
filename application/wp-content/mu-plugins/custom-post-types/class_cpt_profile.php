@@ -56,8 +56,9 @@ class CPT_Profiles
 			if ( !empty( $terms ) ) {
 				$out = array();
 				foreach ( $terms as $c )
-					$_taxonomy_title = esc_html(sanitize_term_field('name', $c->name, $c->term_id, 'category', 'display'));
-					$out[] = "<a href='edit.php?ctax_teamdepartment=$_taxonomy_title&post_type=$_posttype'>$_taxonomy_title</a>";
+					$_taxonomy_title = $c->name;
+					$_taxonomy_slug = $c->slug;
+					$out[] = "<a href='edit.php?ctax_teamdepartment=$_taxonomy_slug&post_type=$_posttype'>$_taxonomy_title</a>";
 				echo join( ', ', $out );
 			}
 			else {
