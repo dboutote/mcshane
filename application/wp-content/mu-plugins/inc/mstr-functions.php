@@ -153,11 +153,34 @@ add_action('post_row_actions', 'mcsh_remove_row_actions', 10, 1 );
 add_action('page_row_actions', 'mcsh_remove_row_actions', 10, 1 );
 
 /**
- * Don't show the Featured Quote Metabox on Page post types
+ * Don't show the Featured Quote Metabox on these post types
  */
 function mcsh_not_feat_quote($dont_show, $post_type){
 	$dont_show[] = 'page';
+	$dont_show[] = 'attachment';
 	return $dont_show;
 }
 
 add_filter('include_featquote_dont_show_list', 'mcsh_not_feat_quote', 0, 2 );
+
+/**
+ * Don't show the Sub Header Metabox on these post types
+ */
+function mcsh_not_subheader($dont_show, $post_type){
+	$dont_show[] = 'attachment';
+	return $dont_show;
+}
+
+add_filter('include_subheader_dont_show_list', 'mcsh_not_subheader', 0, 2 );
+
+
+
+/**
+ * Don't show the Site Section Metabox on these post types
+ */
+function mcsh_not_sitesection($dont_show, $post_type){
+	$dont_show[] = 'attachment';
+	return $dont_show;
+}
+
+add_filter('include_sitesection_dont_show_list', 'mcsh_not_sitesection', 0, 2 );

@@ -42,14 +42,33 @@ class Theme_Functions
 		add_filter( 'nav_menu_css_class', array($this, 'nav_active_class'), 10 , 2);
 		add_filter( 'post_gallery', array($this, 'post_gallery'), 0 , 2);
 		add_filter( 'widget_text', array($this, 'filter_widget_text'), 0 , 2);
+
+		add_action( 'init', array($this, 'remove_filters'), 999 );
+
+
+
+
 	}
-	
-	
+
+
+	/**
+	 * Clean up and remove unneeded filters
+	 *
+	 *
+	 * @access public
+	 * @since McShane 1.0
+	 */
+	public function remove_filters()
+	{
+		remove_filter( 'post_gallery', array('WPGalleryCustomLinks', 'apply_filter_post_gallery'), 999 );
+	}
+
+
 	/**
 	 * String Replace text in widgets
 	 *
 	 * filter the url for images
-	 * 
+	 *
 	 * @access public
 	 * @since McShane 1.0
 	 */
@@ -58,20 +77,20 @@ class Theme_Functions
 		$search = array(
 			'<!-- theme_img_url -->'
 		);
-		
+
 		$replace = array(
 			get_stylesheet_directory_uri() . '/images'
 		);
-		
+
 		$text = str_replace($search, $replace, $text);
-		
+
 		return $text;
-	}	
+	}
 
 
 	/**
 	 * Override Gallery shortcode
-	 * 
+	 *
 	 * @access public
 	 * @since McShane 1.0
 	 */
@@ -176,15 +195,57 @@ class Theme_Functions
 		// are we building grid gallery?
 		if( 'grid' == $attr['tpl'] ) {
 
-			$output = ' <div class="gallery clearfix"><ul>';
+			$output = ' <div class="gallery four clearfix"><ul>';
 
 				foreach ( $attachments as $id => $attachment ) {
+
+					// See if we have a custom url for this attachment image
+					$_gallery_link_url = get_post_meta( $id, '_gallery_link_url', true );
+
+					// See if we have a target for this attachment image
+					$_gallery_link_target = get_post_meta( $id, '_gallery_link_target', true );
+
+					// See if we have additional css classes for this attachment image
+					$_gallery_link_additional_css_classes = get_post_meta( $id, '_gallery_link_additional_css_classes', true );
+
+
 					$image_obj = wp_get_attachment_image_src( $id, 'mcsh-gallery-thumb', false );
 					$img_src = $image_obj[0];
 					$iw = $image_obj[1];
 					$ih = $image_obj[2];
+
+					$image_parts = array();
+					$image_parts['src'] = $img_src;
+					$image_parts['class'] = 'background-cover';
+					$image_parts['width'] = $iw;
+					$image_parts['height'] = $ih;
+					$image_parts['alt'] = '';
+
+					$img_str = '<img';
+					foreach( $image_parts as $k => $v ){
+						$img_str .= ' ' . $k . '="' . $v . '"';
+					}
+					$img_str .= ' />';
+
+					$compiled_link_str = $img_str;
+
+					if('' !== $_gallery_link_url) {
+						$link_parts = array();
+						$link_parts['href'] = esc_url($_gallery_link_url);
+						$link_parts['target'] = esc_attr($_gallery_link_target);
+						$link_parts['class'] = esc_attr($_gallery_link_additional_css_classes);
+
+						$link_str = '<a';
+						foreach( $link_parts as $k => $v ){
+							$link_str .= ' ' . $k . '="' . $v . '"';
+						}
+						$link_str .= '>' . $img_str . '</a>';
+
+						$compiled_link_str = $link_str;
+					}
+
 					$output .= '<li>';
-						$output .= '<a href="#"><img src="'.$img_src.'" class="background-cover" width="'.$iw.'" height="'.$ih.'" alt="" /></a>';
+						$output .= $compiled_link_str;
 					$output .= '</li>';
 				}
 
@@ -254,7 +315,7 @@ class Theme_Functions
 			'after_widget'  => '</aside>',
 			'before_title'  => '<h4 class="widget-title">',
 			'after_title'   => '</h4>',
-		) );		
+		) );
 
 	}
 
@@ -527,7 +588,6 @@ class Theme_Functions
 			true
 		);
 
-
 		wp_register_script(
 			self::THEME_PREFIX . '-main',
 			get_template_directory_uri()  . '/js/script.js',
@@ -576,9 +636,17 @@ class Theme_Functions
 		);
 
 		wp_register_style(
+			'print',
+			get_template_directory_uri()  . '/css/print.css',
+			array('master'),
+			'1.0',
+			'all'
+		);
+
+		wp_register_style(
 			self::THEME_PREFIX . '-main',
 			get_template_directory_uri()  . '/style.css',
-			array('master'),
+			array('print'),
 			'1.0',
 			'all'
 		);
