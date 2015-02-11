@@ -209,13 +209,27 @@ class CPT_News
 				'title' => __('Menu Order'),
 				'description' => __( '', 'mcshane' )
 			),
+			'author' => array(
+				'name' => 'author',
+				'type' => 'text',
+				'default' => '',
+				'title' => __('Author'),
+				'description' => __( '', 'mcshane' ),
+			),			
+			'company' => array(
+				'name' => 'company',
+				'type' => 'text',
+				'default' => '',
+				'title' => __('Company'),
+				'description' => __( '', 'mcshane' ),
+			),			
 			'pdf_url' => array(
 				'name' => 'pdf_url',
 				'type' => 'text',
 				'default' => '',
 				'title' => __('PDF URL'),
 				'description' => __( 'URL to PDF file.', 'mcshane' ),
-			),
+			),			
 		);
 
 		$args = array(
@@ -270,10 +284,20 @@ class CPT_News
 			}
 			*/
 
-			if ( 'pdf_url' === $meta_field['name']) {
+			if ( 'author' === $meta_field['name']) {
 				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
 				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
 			}
+			
+			if ( 'company' === $meta_field['name']) {
+				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
+				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
+			}
+			
+			if ( 'pdf_url' === $meta_field['name']) {
+				$output .= '<p><b><label for="'.$meta_field['name'].'">'.$meta_field['title'].'</label></b><br />';
+				$output .= '<input class="reg-text" type="text" id="'.$meta_field['name'].'" name="'.$meta_field['name'].'" value="'.$meta_field_value.'" size="16" style="width: 99%;" /> <span class="desc">'.$meta_field['description'].'</span></p>';
+			}			
 
 		}
 

@@ -56,13 +56,12 @@ get_header(); ?>
 		<?php endwhile; ?>
 
 		<?php
-		$_news_tax_terms = get_post_meta(get_the_ID(), '_news_tax_terms', true);
-		$_p_type = get_post_meta(get_the_ID(), '_news_p_type', true);
+		$_tax_terms = get_post_meta(get_the_ID(), '_tax_terms', true);
+		$_p_type = get_post_meta(get_the_ID(), '_p_type', true);
 		$_p_type = ( $_p_type ) ? $_p_type : 'post';
-		$tax_query = array();
 
-		if( '' !== $_news_tax_terms ){
-			$meta_tax = explode(':', $_news_tax_terms);
+		if( '' !== $_tax_terms ){
+			$meta_tax = explode(':', $_tax_terms);
 			$selected_tax = $meta_tax[0];
 			$selected_term = $meta_tax[1];
 			$_term = get_term_by( 'slug', $selected_term, $selected_tax);
@@ -95,6 +94,8 @@ get_header(); ?>
 					<?php while ( $r->have_posts() ) : $r->the_post(); ?>
 
 					<?php $_pdf_url = get_post_meta(get_the_ID(), '_pdf_url', true); ?>
+					<?php $_author = get_post_meta(get_the_ID(), '_author', true); ?>
+					<?php $_company = get_post_meta(get_the_ID(), '_company', true); ?>
 
 						<hr />
 
@@ -114,8 +115,16 @@ get_header(); ?>
 							</a>
 
 							<?php if( has_subheader() ) { ?> <p> <?php display_subheader();?></p> <?php } ?>
+							
+							<?php if( $_author ) { ?>
+								<p>
+									<?php echo $_author;?>
+									<?php if( $_company ) {  echo '<br /> '. $_company; } ?>
+								</p>							
+							<?php } ?>
+							
 							<?php if( $_pdf_url ) { ?>
-								<p><a href="<?php echo esc_url($_pdf_url); ?>"><img src="<?php echo get_stylesheet_directory_uri();?>/images/pdf_icon.gif" alt="pdf_icon" width="16" height="16" /> Download PDF</a></p>
+								<p><a href="<?php echo esc_url($_pdf_url); ?>" target="_blank"><img src="<?php echo get_stylesheet_directory_uri();?>/images/pdf_icon.gif" alt="pdf_icon" width="16" height="16" /> Download PDF</a></p>
 							<?php } ?>
 
 						</div>
