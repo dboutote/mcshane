@@ -282,7 +282,7 @@ class Widget_Featured_Content extends WP_Widget {
 
 		if ( ! $this->is_preview() ) {
 			$cache[ $args['widget_id'] ] = ob_get_flush();
-			wp_cache_set( 'widget_featured_content', $cache, 'widget' );
+			wp_cache_set( 'widget_featured_content', $cache, 'widget', 300 );
 		} else {
 			ob_end_flush();
 		}
